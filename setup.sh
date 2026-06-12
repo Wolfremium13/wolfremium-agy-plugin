@@ -4,6 +4,7 @@
 # Set the path to your central standards repository
 VAULT_DIR=".wolfremium-agents"
 TARGET_DIR=".agents"
+GLOBAL_AGENTS_DIR="${HOME}/.gemini/antigravity-cli/agents"
 
 # 1. Gather all subfolders in $VAULT_DIR
 options=()
@@ -71,6 +72,8 @@ echo "Bootstrapping Antigravity workspace from $VAULT_DIR..."
 
 # 2. Create the standard Antigravity directories expected by the IDE
 mkdir -p "$TARGET_DIR/rules" "$TARGET_DIR/skills" "$TARGET_DIR/agents"
+# Also ensure the global agents directory exists (for cross-project visibility)
+mkdir -p "$GLOBAL_AGENTS_DIR"
 
 # Clean up broken symlinks inside target rules/skills/agents directories
 find "$TARGET_DIR/rules" -maxdepth 1 -type l ! -exec test -e {} \; -delete
@@ -107,12 +110,21 @@ for SLICE_NAME in "${SELECTED_SLICES[@]}"; do
             for AGENT_DIR in "$SLICE/agents"/*; do
                 if [ -d "$AGENT_DIR" ]; then
                     AGENT_NAME=$(basename "$AGENT_DIR")
+                    # Workspace-scoped: .agents/agents/<name>/agent.json
                     mkdir -p "$TARGET_DIR/agents/$AGENT_NAME"
                     for FILE in "$AGENT_DIR"/*; do
                         if [ -e "$FILE" ]; then
                             ln -sfn "$(realpath "$FILE")" "$TARGET_DIR/agents/$AGENT_NAME/"
                         fi
                     done
+                    # Global: ~/.gemini/antigravity-cli/agents/<name>/agent.json
+                    mkdir -p "$GLOBAL_AGENTS_DIR/$AGENT_NAME"
+                    for FILE in "$AGENT_DIR"/*; do
+                        if [ -e "$FILE" ]; then
+                            ln -sfn "$(realpath "$FILE")" "$GLOBAL_AGENTS_DIR/$AGENT_NAME/"
+                        fi
+                    done
+                    echo "  Registered agent: $AGENT_NAME (workspace + global)"
                 fi
             done
         fi
@@ -120,9 +132,10 @@ for SLICE_NAME in "${SELECTED_SLICES[@]}"; do
 done
 
 # 4. Ensure the injected config is ignored by the project's Git repository
-if ! grep -q "^.agents" .gitignore; then
+if ! grep -q "^.agents/" .gitignore; then
     echo ".agents/" >> .gitignore
     echo "Added .agents/ to .gitignore"
 fi
 
 echo "Workspace configuration updated successfully!"
+echo "Global agents registered at: $GLOBAL_AGENTS_DIR"
