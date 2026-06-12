@@ -78,18 +78,20 @@ for SLICE_NAME in "${SELECTED_SLICES[@]}"; do
 
         # Symlink the domain-specific rules into the active workspace
         if [ -d "$SLICE/rules" ]; then
-            files=("$SLICE/rules"/*)
-            if [ -e "${files[0]}" ]; then
-                ln -sfn "$SLICE/rules/"* "$TARGET_DIR/rules/"
-            fi
+            for FILE in "$SLICE/rules"/*; do
+                if [ -e "$FILE" ]; then
+                    ln -sfn "../../$FILE" "$TARGET_DIR/rules/"
+                fi
+            done
         fi
 
         # Symlink the domain-specific skills into the active workspace
         if [ -d "$SLICE/skills" ]; then
-            files=("$SLICE/skills"/*)
-            if [ -e "${files[0]}" ]; then
-                ln -sfn "$SLICE/skills/"* "$TARGET_DIR/skills/"
-            fi
+            for FILE in "$SLICE/skills"/*; do
+                if [ -e "$FILE" ]; then
+                    ln -sfn "../../$FILE" "$TARGET_DIR/skills/"
+                fi
+            done
         fi
     fi
 done
