@@ -70,11 +70,12 @@ done
 echo "Bootstrapping Antigravity workspace from $VAULT_DIR..."
 
 # 2. Create the standard Antigravity directories expected by the IDE
-mkdir -p "$TARGET_DIR/rules" "$TARGET_DIR/skills"
+mkdir -p "$TARGET_DIR/rules" "$TARGET_DIR/skills" "$TARGET_DIR/agents"
 
-# Clean up broken symlinks inside target rules/skills directories
+# Clean up broken symlinks inside target rules/skills/agents directories
 find "$TARGET_DIR/rules" -maxdepth 1 -type l ! -exec test -e {} \; -delete
 find "$TARGET_DIR/skills" -maxdepth 1 -type l ! -exec test -e {} \; -delete
+find "$TARGET_DIR/agents" -maxdepth 1 -type l ! -exec test -e {} \; -delete
 
 # 3. Iterate through selected slices and symlink them
 for SLICE_NAME in "${SELECTED_SLICES[@]}"; do
@@ -96,6 +97,15 @@ for SLICE_NAME in "${SELECTED_SLICES[@]}"; do
             for FILE in "$SLICE/skills"/*; do
                 if [ -e "$FILE" ]; then
                     ln -sfn "../../$FILE" "$TARGET_DIR/skills/"
+                fi
+            done
+        fi
+
+        # Symlink the domain-specific agents into the active workspace
+        if [ -d "$SLICE/agents" ]; then
+            for FILE in "$SLICE/agents"/*; do
+                if [ -e "$FILE" ]; then
+                    ln -sfn "../../$FILE" "$TARGET_DIR/agents/"
                 fi
             done
         fi
