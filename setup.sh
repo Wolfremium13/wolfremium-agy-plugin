@@ -80,7 +80,7 @@ for SLICE_NAME in "${SELECTED_SLICES[@]}"; do
         if [ -d "$SLICE/rules" ]; then
             files=("$SLICE/rules"/*)
             if [ -e "${files[0]}" ]; then
-                ln -sf "$SLICE/rules/"* "$TARGET_DIR/rules/"
+                ln -sfn "$SLICE/rules/"* "$TARGET_DIR/rules/"
             fi
         fi
 
@@ -88,7 +88,7 @@ for SLICE_NAME in "${SELECTED_SLICES[@]}"; do
         if [ -d "$SLICE/skills" ]; then
             files=("$SLICE/skills"/*)
             if [ -e "${files[0]}" ]; then
-                ln -sf "$SLICE/skills/"* "$TARGET_DIR/skills/"
+                ln -sfn "$SLICE/skills/"* "$TARGET_DIR/skills/"
             fi
         fi
     fi
