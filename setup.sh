@@ -75,7 +75,8 @@ mkdir -p "$TARGET_DIR/rules" "$TARGET_DIR/skills" "$TARGET_DIR/agents"
 # Clean up broken symlinks inside target rules/skills/agents directories
 find "$TARGET_DIR/rules" -maxdepth 1 -type l ! -exec test -e {} \; -delete
 find "$TARGET_DIR/skills" -maxdepth 1 -type l ! -exec test -e {} \; -delete
-find "$TARGET_DIR/agents" -maxdepth 1 -type l ! -exec test -e {} \; -delete
+find "$TARGET_DIR/agents" -mindepth 2 -type l ! -exec test -e {} \; -delete
+find "$TARGET_DIR/agents" -mindepth 1 -type d -empty -delete
 
 # 3. Iterate through selected slices and symlink them
 for SLICE_NAME in "${SELECTED_SLICES[@]}"; do
@@ -87,7 +88,7 @@ for SLICE_NAME in "${SELECTED_SLICES[@]}"; do
         if [ -d "$SLICE/rules" ]; then
             for FILE in "$SLICE/rules"/*; do
                 if [ -e "$FILE" ]; then
-                    ln -sfn "../../$FILE" "$TARGET_DIR/rules/"
+                    ln -sfn "$(realpath "$FILE")" "$TARGET_DIR/rules/"
                 fi
             done
         fi
@@ -96,16 +97,22 @@ for SLICE_NAME in "${SELECTED_SLICES[@]}"; do
         if [ -d "$SLICE/skills" ]; then
             for FILE in "$SLICE/skills"/*; do
                 if [ -e "$FILE" ]; then
-                    ln -sfn "../../$FILE" "$TARGET_DIR/skills/"
+                    ln -sfn "$(realpath "$FILE")" "$TARGET_DIR/skills/"
                 fi
             done
         fi
 
         # Symlink the domain-specific agents into the active workspace
         if [ -d "$SLICE/agents" ]; then
-            for FILE in "$SLICE/agents"/*; do
-                if [ -e "$FILE" ]; then
-                    ln -sfn "../../$FILE" "$TARGET_DIR/agents/"
+            for AGENT_DIR in "$SLICE/agents"/*; do
+                if [ -d "$AGENT_DIR" ]; then
+                    AGENT_NAME=$(basename "$AGENT_DIR")
+                    mkdir -p "$TARGET_DIR/agents/$AGENT_NAME"
+                    for FILE in "$AGENT_DIR"/*; do
+                        if [ -e "$FILE" ]; then
+                            ln -sfn "$(realpath "$FILE")" "$TARGET_DIR/agents/$AGENT_NAME/"
+                        fi
+                    done
                 fi
             done
         fi
