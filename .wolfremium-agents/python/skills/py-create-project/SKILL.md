@@ -1,5 +1,5 @@
 ---
-name: create-project
+name: py-create-project
 description: Create new Python projects, bounded contexts, features, value objects, domain models, ports, use cases, or web routers complying with Clean Architecture, DDD, naming, coding-style, and monadic Result error handling.
 ---
 

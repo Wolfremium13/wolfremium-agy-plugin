@@ -1,5 +1,5 @@
 ---
-name: lint-project
+name: py-lint-project
 description: Audit the codebase or specific Python files to ensure strict compliance with Clean Architecture, DDD, monadic Result control flow, naming conventions, pytest/assertpy testing patterns, and commenting guidelines.
 ---
 

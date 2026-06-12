@@ -1,5 +1,5 @@
 ---
-name: create-project
+name: cs-create-project
 description: Create new C# projects, bounded contexts, features, value objects, domain models, ports, use cases, or controllers complying with Clean Architecture, DDD, naming, coding-style, and LanguageExt monadic error handling.
 ---
 

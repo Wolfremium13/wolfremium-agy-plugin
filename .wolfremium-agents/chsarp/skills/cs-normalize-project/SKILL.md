@@ -1,5 +1,5 @@
 ---
-name: normalize-project
+name: cs-normalize-project
 description: Automatically refactor, format, and normalize C# files or projects to conform with Clean Architecture, DDD, LanguageExt monadic pipelines, naming rules, test structures, and comment guidelines.
 ---
 

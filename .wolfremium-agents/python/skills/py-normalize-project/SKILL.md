@@ -1,5 +1,5 @@
 ---
-name: normalize-project
+name: py-normalize-project
 description: Automatically refactor, format, and normalize Python files or projects to conform with Clean Architecture, DDD, monadic Result pipelines, naming rules, test structures, and comment guidelines.
 ---
 

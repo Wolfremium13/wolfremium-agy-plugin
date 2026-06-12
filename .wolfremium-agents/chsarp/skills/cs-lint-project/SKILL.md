@@ -1,5 +1,5 @@
 ---
-name: lint-project
+name: cs-lint-project
 description: Audit the codebase or specific C# files to ensure strict compliance with Clean Architecture, DDD, LanguageExt monadic control flow, naming conventions, unit testing patterns, and commenting guidelines.
 ---
 
