@@ -23,9 +23,10 @@ echo "---------------------------------"
 for i in "${!options[@]}"; do
     echo "  $((i+1))) ${options[i]}"
 done
+echo "  $((${#options[@]}+1))) All"
 echo "---------------------------------"
 echo "Enter the numbers of the folders you want to import, separated by spaces (e.g., '1 2')."
-echo "Or enter 'a' for all folders, or 'c' to cancel."
+echo "Or enter 'c' to cancel."
 
 while true; do
     read -p "Selection: " input
@@ -45,8 +46,13 @@ while true; do
     temp_selected=()
     # Read words from input
     for num in $input; do
-        if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "${#options[@]}" ]; then
-            temp_selected+=("${options[num-1]}")
+        if [[ "$num" =~ ^[0-9]+$ ]] && [ "$num" -ge 1 ] && [ "$num" -le "$((${#options[@]}+1))" ]; then
+            if [ "$num" -eq "$((${#options[@]}+1))" ]; then
+                temp_selected=("${options[@]}")
+                break
+            else
+                temp_selected+=("${options[num-1]}")
+            fi
         else
             valid=false
             break
@@ -58,7 +64,7 @@ while true; do
         break
     fi
 
-    echo "Invalid option. Please enter space-separated numbers corresponding to the folders, 'a', or 'c'."
+    echo "Invalid option. Please enter space-separated numbers corresponding to the folders, or 'c' to cancel."
 done
 
 echo "Bootstrapping Antigravity workspace from $VAULT_DIR..."
