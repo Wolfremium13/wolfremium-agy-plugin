@@ -66,9 +66,9 @@ echo "Bootstrapping Antigravity workspace from $VAULT_DIR..."
 # 2. Create the standard Antigravity directories expected by the IDE
 mkdir -p "$TARGET_DIR/rules" "$TARGET_DIR/skills"
 
-# Clean up existing symlinks inside target rules/skills directories
-find "$TARGET_DIR/rules" -maxdepth 1 -type l -delete
-find "$TARGET_DIR/skills" -maxdepth 1 -type l -delete
+# Clean up broken symlinks inside target rules/skills directories
+find "$TARGET_DIR/rules" -maxdepth 1 -type l ! -exec test -e {} \; -delete
+find "$TARGET_DIR/skills" -maxdepth 1 -type l ! -exec test -e {} \; -delete
 
 # 3. Iterate through selected slices and symlink them
 for SLICE_NAME in "${SELECTED_SLICES[@]}"; do
