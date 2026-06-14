@@ -113,11 +113,11 @@ public static class BillingErrors
 Controllers must follow the Single Responsibility Principle and the REPR (Request-Endpoint-Response) pattern.
 
 - **Single Action Method**: Each controller class must expose exactly **one** public action method.
-- **Naming Convention**: The controller class and file must be named `<original-name><action>Should.cs` (e.g., `UserRegisterShould.cs`).
+- **Naming Convention**: The controller class and file must be named `<original-name><action>Controller.cs` (e.g., `UserRegisterController.cs`).
 - **Attributes**: State versioning, routing, OpenAPI summary, description, and expected response types (`ProducesResponseType`).
 - **Functional Mapping**: Map Either outcomes to `IResult` outputs using `.Match` or `.MatchAsync`.
 
-### Example Controller (`UserRegisterShould.cs`)
+### Example Controller (`UserRegisterController.cs`)
 ```csharp
 using System.ComponentModel;
 using System.Text.Json.Serialization;
@@ -131,7 +131,7 @@ namespace DomainProject.Internal.Web.Controllers.V1.Users;
 [ApiController]
 [Route("v1/users")]
 [Tags("User Management")]
-public class UserRegisterShould(
+public class UserRegisterController(
     IRegisterUser registerService
 ) : ControllerBase
 {

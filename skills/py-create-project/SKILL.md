@@ -80,6 +80,7 @@ Follow these strict design rules during creation:
 - Assert both success and failure (invalid boundary) states for value objects.
 - Create **Test Data Builders** (e.g. `InvoiceIdBuilder`) to arrange test data cleanly.
 - Use `unittest.mock` or `mocker` to mock interface dependencies.
+- **Scenario Tests**: Put every scenario/E2E test in a dedicated module and file under a `scenarios/` directory. To prevent concurrency conflicts (especially when running in parallel), decorate them with `@pytest.mark.xdist_group(name="scenario_tests")` to run them sequentially.
 
 ---
 

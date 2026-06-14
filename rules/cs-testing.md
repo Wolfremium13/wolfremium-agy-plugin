@@ -188,3 +188,37 @@ Testing is structured to balance speed and confidence:
 ### 5.3 Domain Layer
 - **Unit Tests for Domain Models**: Domain Models (Entities, Aggregates) and Value Objects must be thoroughly tested using unit tests.
 - **Scope**: Validate all business invariants, state transition rules, and factory methods (`Create`), ensuring both success paths and error states (represented as Left values in `Either` monads) are fully covered. Do not use mocks or external dependencies when testing the domain layer.
+
+---
+
+## 6. Scenario Tests & Concurrency
+
+Scenario tests (end-to-end flow tests or multi-component integration tests) verify complete business workflows, often interacting with actual databases, caches, or external containers. Because these tests share stateful external resources, running them concurrently can lead to race conditions, database constraints violations, or transient failures.
+
+### 6.1 Separate Files
+- Every scenario test must reside in its own dedicated class and file. Never mix scenario tests with unit tests or group multiple unrelated scenario tests within the same file.
+- Scenario tests should be placed in a dedicated `Scenarios/` folder inside the test project (e.g., `Common.Test.Billing.Scenarios/`).
+
+### 6.2 Handling Concurrency (xUnit)
+To prevent concurrent execution problems, all scenario tests that share the same database or test container must run sequentially.
+- **xUnit Test Collections**: Decorate every scenario test class with the `[Collection("ScenarioTests")]` attribute. xUnit executes all test classes belonging to the same collection sequentially rather than in parallel.
+- **Database & State Isolation**: Ensure each test run resets state or uses unique identifiers (e.g., random client IDs, unique generated transaction codes) to prevent test-to-test pollution even when executed sequentially.
+
+#### Example Scenario Test
+```csharp
+using Xunit;
+using Shouldly;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Common.Test.Billing.Scenarios;
+
+[Collection("ScenarioTests")]
+public class UserRegistrationScenario
+{
+    [Fact]
+    public async Task RegisterAndActivateUserSuccessfully()
+    {
+        // Act and assert the full registration and activation flow
+    }
+}
+```

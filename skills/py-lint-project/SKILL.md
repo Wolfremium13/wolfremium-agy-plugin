@@ -68,6 +68,7 @@ Inspect each target file against the following specific rules:
 - **Assertions**: Verify that tests use `assertpy` fluent assertions (e.g. `assert_that(val).is_equal_to(expected)`).
 - **Mocks**: Verify that mock setups utilize `unittest.mock` or `mocker` from `pytest-mock`.
 - **Builders**: Verify that complex test data setup utilizes the Test Data Builder pattern.
+- **Scenario Tests**: Verify that scenario/E2E tests reside in dedicated modules under a `scenarios/` directory, and that they are decorated with `@pytest.mark.xdist_group(name="scenario_tests")` to run sequentially, avoiding database/port concurrency conflicts.
 
 ---
 

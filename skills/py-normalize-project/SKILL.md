@@ -69,6 +69,7 @@ Execute the refactoring steps precisely based on the workspace rules:
 - Convert test assertions to `assertpy` fluent syntax (`assert_that(val).is_equal_to(...)`).
 - Implement `unittest.mock` or `mocker` for mocks and stub behaviors.
 - Refactor complex test setups into Test Data Builders.
+- **Scenario Tests**: Move scenario/E2E tests into separate files under a `scenarios/` folder, and ensure they are decorated with `@pytest.mark.xdist_group(name="scenario_tests")` to handle potential database/port concurrency issues.
 
 ---
 

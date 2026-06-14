@@ -180,3 +180,32 @@ class TestProcessInvoicePayment:
             "test-env"
         )
 ```
+
+---
+
+## 5. Scenario Tests & Concurrency
+
+Scenario tests (end-to-end flow tests or multi-component integration tests) verify complete business workflows, often interacting with actual databases, caches, or external containers. Because these tests share stateful external resources, running them concurrently can lead to race conditions, database constraints violations, or transient failures.
+
+### 5.1 Separate Files
+- Every scenario test must reside in its own dedicated module and file. Never mix scenario tests with unit tests or group multiple unrelated scenario tests within the same file.
+- Scenario tests should be placed in a dedicated `scenarios/` folder inside the test directory (e.g., `tests/billing/scenarios/`).
+
+### 5.2 Handling Concurrency (pytest)
+To prevent concurrent execution problems (especially when running with parallel test runners like `pytest-xdist`), all scenario tests that share the same database or test container must run sequentially.
+- **xdist Grouping**: Decorate scenario test classes or methods with `@pytest.mark.xdist_group(name="scenario_tests")`. This ensures all tests within the group run on a single worker process sequentially.
+- **Marker Filter**: Register a custom marker (e.g. `@pytest.mark.scenario`) and if parallel runners cause issues, run them separately without parallelism using the command: `pytest -m scenario -n0`.
+- **Database & State Isolation**: Ensure each test run resets state or uses unique identifiers (e.g., random client IDs, unique generated transaction codes) to prevent test-to-test pollution even when executed sequentially.
+
+#### Example Scenario Test
+```python
+import pytest
+from assertpy import assert_that
+
+@pytest.mark.scenario
+@pytest.mark.xdist_group(name="scenario_tests")
+class TestUserRegistrationScenario:
+    async def test_should_register_and_activate_user_successfully(self) -> None:
+        # Act and assert the full registration and activation flow
+        pass
+```

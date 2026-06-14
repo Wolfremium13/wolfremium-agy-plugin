@@ -56,3 +56,6 @@ Consistency in naming ensures readability across diverse modules:
 
 ### 2.9 Do Not Use Acronyms
 - Avoid using acronyms or abbreviations in naming. Spell out words fully to ensure clarity, reduce ambiguity, and maintain readability across the codebase (e.g., use `UserIdentifier` instead of `UID`, or `Request` instead of `Req`).
+
+### 2.10 Do Not Use "Should" in Production Naming
+- Production code names (including files, classes, interfaces, records, methods, parameters, and variables) must not contain the word 'should' (case-insensitive) in their names. The use of 'should' is strictly reserved for test projects and test-related elements (e.g., unit test classes named with `Should` suffix).

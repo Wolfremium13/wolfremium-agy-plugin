@@ -56,3 +56,6 @@ Consistency in naming ensures readability across diverse modules:
 
 ### 2.8 Enforce Strict Consistency and Reject Aliases
 - Use the exact same name for a specific concept throughout the entire codebase. Do not use synonyms, aliases, or alternative translations for the same domain concept.
+
+### 2.9 Do Not Use "Should" in Production Naming
+- Production code names (including packages, modules, classes, functions, methods, parameters, and variables) must not contain the word 'should' (case-insensitive) in their names. The use of 'should' is strictly reserved for test files and test-related elements (e.g., test method names starting with `test_should_`).

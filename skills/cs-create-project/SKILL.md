@@ -74,7 +74,7 @@ Follow these strict design rules during creation:
 - Infrastructure classes prefixed with specific technology/protocol, never generic suffixes like `Impl` (e.g., `PostgresUserRepository` instead of `UserRepositoryImpl`).
 - Unit test classes named `[ClassName]Should` (e.g., `UserRegisterShould`).
 - **No Acronyms**: Avoid using acronyms in names (e.g., use `UserIdentifier` instead of `UID`, or `Request` instead of `Req`). Spell out concepts fully.
-- **Web Controllers**: Must contain only **one** action method. Name the controller file and class following the pattern `<original-name><action>Should.cs` (e.g., `UserRegisterShould.cs` under the directory `Users/V1/`).
+- **Web Controllers**: Must contain only **one** action method. Name the controller file and class following the pattern `<original-name><action>Controller.cs` (e.g., `UserRegisterController.cs` under the directory `Users/V1/`).
 
 ### 5. Centralized Error Handling (from `cs-coding-style.md`)
 - Use static error holder classes with nested custom exception classes extending `Exception` (e.g., `BillingErrors.ClientValidationException`) to wrap LanguageExt errors.
@@ -90,6 +90,7 @@ Follow these strict design rules during creation:
 - **Controllers**: Test API Controllers via **unit tests** using **NSubstitute** to mock use case/application contracts.
 - **Infrastructure**: Test infrastructure components via **integration tests** using in-memory databases (for EF Core) or **Testcontainers** for specific external services (e.g. Postgres, RabbitMQ, Redis).
 - **Domain**: Test Domain Models (Entities, Aggregates) and Value Objects via **unit tests** to validate business invariants, state transition rules, and factory methods without external mocks.
+- **Scenario Tests**: Put every scenario test in a dedicated class and file under a `Scenarios/` directory. To prevent concurrency conflicts (e.g., on databases or ports), always decorate scenario test classes with `[Collection("ScenarioTests")]` to run them sequentially.
 
 ---
 

@@ -71,7 +71,7 @@ To maximize maintainability and keep files small, the project uses a `[BoundedCo
 │   ├── Controllers/
 │   │   └── V[Number]/               # API Versioning (e.g., V1, V2)
 │   │       └── [BoundedContext]/    # Grouped by bounded context (e.g., Users)
-│   │           └── [BoundedContext][Action]Should.cs # Single-method controllers
+│   │           └── [BoundedContext][Action]Controller.cs # Single-method controllers
 │   └── Program.cs
 │
 └── DomainProject.Internal.Worker/   # Background processing / Event consumers
@@ -82,7 +82,7 @@ To maximize maintainability and keep files small, the project uses a `[BoundedCo
 
 ### 2.2 Web API Controllers
 - **Single Method Only**: All controllers must be design-focused and implement exactly **one** public action method (REPR pattern).
-- **Naming Convention**: The controller class and file must be named following the pattern `<original-name><action>Should.cs` (e.g., `Users/V1/UserRegisterShould.cs` containing the `UserRegisterShould` controller class).
+- **Naming Convention**: The controller class and file must be named following the pattern `<original-name><action>Controller.cs` (e.g., `Users/V1/UserRegisterController.cs` containing the `UserRegisterController` controller class).
 
 ### 2.3 Dependency Injection & Configuration encapsulation
 - **Inject via Extensions**: Always create extension methods (e.g., `IServiceCollection` extension methods) to encapsulate and hide how infrastructure, services, or settings are injected.

@@ -60,7 +60,7 @@ Inspect each target file against the following specific rules:
 - **Infrastructure Adapters**: Check concrete implementations in the `Infrastructure` folder. They must be prefixed with their specific technology/protocol (e.g., `PostgresUserRepository`) and MUST NOT use generic suffixes like `Impl` or `Base`.
 - **Catch-All Words**: Ensure classes do not contain words like `Manager`, `Helper`, `Processor`, `Engine`, `Tool`, or `Utils`.
 - **No Acronyms**: Ensure that names do not contain acronyms or abbreviations (e.g., use `UserIdentifier` instead of `UID`, or `Request` instead of `Req`). Spell out concepts fully.
-- **Web Controllers**: Ensure each controller class exposes exactly **one** public action method. Check if the controller class/file is named `<original-name><action>Should.cs` (e.g., `UserRegisterShould.cs`).
+- **Web Controllers**: Ensure each controller class exposes exactly **one** public action method. Check if the controller class/file is named `<original-name><action>Controller.cs` (e.g., `UserRegisterController.cs`).
 
 ### 5. Commenting Guidelines (from `cs-comments.md`)
 - **Redundancy (Phase 1)**: Verify that comments do not explain "how" the code works, repeat the code, or could be replaced by better naming or types. Comments must be avoided as much as possible.
@@ -73,6 +73,7 @@ Inspect each target file against the following specific rules:
 - **Builders**: Verify that complex test data setup utilizes the Test Data Builder pattern.
 - **No Comments in Tests**: Ensure unit and integration tests do not contain block comments (such as `// Arrange`, `// Act`, `// Assert`). Test phases must be separated strictly by vertical whitespace (empty lines).
 - **Testing Strategy**: Verify API controllers are unit-tested using mocks for application contracts, infrastructure components use integration tests (EF Core in-memory or Testcontainers), and Domain Models/Value Objects are unit-tested for invariants and factory methods.
+- **Scenario Tests**: Verify that scenario/E2E tests are located in dedicated files under a `Scenarios/` directory, and that their classes are decorated with `[Collection("ScenarioTests")]` to run sequentially, avoiding database/port concurrency conflicts.
 
 ---
 

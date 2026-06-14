@@ -67,7 +67,7 @@ Execute the refactoring steps precisely based on the workspace rules:
 - Remove generic prefixes/suffixes like `Impl` or `Base` from infrastructure classes. Prefix them with specific tech names (e.g., rename `UserRepositoryImpl` to `PostgresUserRepository`).
 - Rename any classes using catch-all words (like `Manager`, `Helper`, `Processor`, `Engine`, `Utils`) to names representing concrete business intents.
 - **No Acronyms**: Replace acronyms and abbreviations with fully spelled-out names (e.g., rename `UID` to `UserIdentifier`, `Req` to `Request`).
-- **Web Controllers**: Ensure each controller class exposes exactly **one** action method. Rename the controller file and class to `<original-name><action>Should.cs` (e.g., `UserRegisterShould.cs`).
+- **Web Controllers**: Ensure each controller class exposes exactly **one** action method. Rename the controller file and class to `<original-name><action>Controller.cs` (e.g., `UserRegisterController.cs`).
 
 ### 5. Comment Cleanup (from `cs-comments.md`)
 - Avoid comments as much as possible. Delete comments that explain "how" the code works or repeat what the code says.
@@ -81,6 +81,7 @@ Execute the refactoring steps precisely based on the workspace rules:
 - Refactor complex test setups into Test Data Builders (which may throw exceptions if configured invalidly).
 - **Remove Comments in Tests**: Delete all comments (such as `// Arrange`, `// Act`, `// Assert`, and descriptions) from unit/integration tests, using empty lines instead.
 - **Testing Strategy**: Align test scopes (unit test controllers with NSubstitute mocks; integration test infrastructure using EF in-memory or Testcontainers; unit test domain models/value objects for business invariants).
+- **Scenario Tests**: Move scenario/E2E tests into separate files under a `Scenarios/` folder, and ensure their classes are decorated with the `[Collection("ScenarioTests")]` attribute to handle potential database/port concurrency issues.
 
 ---
 
