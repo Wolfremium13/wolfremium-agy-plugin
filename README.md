@@ -14,9 +14,6 @@ This repository houses central, reusable standards, rules, and skills for autono
     *   **C# Agents**:
         *   [`cs-developer`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/agents/cs-developer/agent.json) - Profile for building Clean Architecture & DDD components in C#.
         *   [`cs-reviewer`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/agents/cs-reviewer/agent.json) - Profile for auditing C# codebases for compliance.
-    *   **Python Agents**:
-        *   [`py-developer`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/agents/py-developer/agent.json) - Profile for building Clean Architecture & DDD components in Python.
-        *   [`py-reviewer`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/agents/py-reviewer/agent.json) - Profile for auditing Python codebases for compliance.
 
 *   **⚡ Custom Skills**:
     Executable workflows with detailed instruction manuals and script bindings:
@@ -24,10 +21,6 @@ This repository houses central, reusable standards, rules, and skills for autono
         *   [`cs-create-project`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/skills/cs-create-project/SKILL.md) - Plan and scaffold projects and components.
         *   [`cs-lint-project`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/skills/cs-lint-project/SKILL.md) - Scan codebase and enforce compliance rules.
         *   [`cs-normalize-project`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/skills/cs-normalize-project/SKILL.md) - Automatically format and refactor files.
-    *   **Python Skills**:
-        *   [`py-create-project`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/skills/py-create-project/SKILL.md) - Plan and scaffold projects and packages.
-        *   [`py-lint-project`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/skills/py-lint-project/SKILL.md) - Scan codebase and enforce compliance rules.
-        *   [`py-normalize-project`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/skills/py-normalize-project/SKILL.md) - Automatically format and refactor files.
 
 *   **📘 Architectural & Design Rules**:
     Mandatory design rules loaded directly into agent contexts:
@@ -38,13 +31,6 @@ This repository houses central, reusable standards, rules, and skills for autono
         *   [`cs-domain-driven-design.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/cs-domain-driven-design.md)
         *   [`cs-naming.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/cs-naming.md)
         *   [`cs-testing.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/cs-testing.md)
-    *   **Python Rules**:
-        *   [`py-architecture.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/py-architecture.md)
-        *   [`py-coding-style.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/py-coding-style.md)
-        *   [`py-comments.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/py-comments.md)
-        *   [`py-domain-driven-design.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/py-domain-driven-design.md)
-        *   [`py-naming.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/py-naming.md)
-        *   [`py-testing.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/py-testing.md)
 
 ---
 
