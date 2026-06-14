@@ -257,6 +257,22 @@ public static class RoomAccessServiceCollectionExtensions
 }
 ```
 
+### 6.3 Required Constructor Parameters & Logging
+- **No Optional Loggers / No `= null`**: Never declare logger dependencies in class/controller constructors (or primary constructors) with a default value of `null` (e.g., `ILogger<T> logger = null` is strictly forbidden). Loggers must be required dependencies.
+- **Handling in Tests**: In unit tests, rather than passing `null` or relying on optional parameters, always provide a mocked logger using NSubstitute (e.g., `Substitute.For<ILogger<T>>()`) or use `NullLogger<T>.Instance` from `Microsoft.Extensions.Logging.Abstractions`.
+
+### 6.4 High-Performance Logging & CA1873
+To prevent performance degradation from evaluating expensive arguments (like string interpolation, complex method calls, or serialization) when the target log level is disabled (complying with warning **CA1873**):
+- **Use Structured Logging Properly**: Do not use string interpolation directly inside log messages (e.g., prefer `logger.LogInformation("User {UserId} registered", userId)` over `logger.LogInformation($"User {userId} registered")`).
+- **Guard Expensive Arguments**: If an argument passed to a log method requires evaluation (e.g. `list.Count()`, serializing an object, or complex string manipulations), always wrap the log call in an `IsEnabled` check:
+  ```csharp
+  if (logger.IsEnabled(LogLevel.Debug))
+  {
+      logger.LogDebug("Processed items: {Items}", string.Join(", ", items));
+  }
+  ```
+- **LoggerMessage Source Generation**: For hot paths or frequent logging, define partial log methods decorated with the `[LoggerMessage]` attribute, which automatically generates optimized logging code that checks `IsEnabled` before evaluating any arguments.
+
 ---
 
 ## 7. Deterministic Non-Deterministic Operations (Time & Random Generations)

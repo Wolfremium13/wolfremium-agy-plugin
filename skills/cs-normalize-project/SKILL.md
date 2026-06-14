@@ -42,7 +42,8 @@ Execute the refactoring steps precisely based on the workspace rules:
 - Adjust the namespace value to match the exact directory path using action-based vertical feature slicing:
   `namespace Common.[DomainSubdomain].[BoundedContext].[Action].[Layer].[SubFolder];`
 - Move files to conform to the `[BoundedContext]/[Action]/[Layer]` folder hierarchy (e.g., `Users/Register/Domain` or `Users/Register/Application`), ensuring `Application/Contracts` holds use case contracts.
-- Encapsulate all settings and dependency injections into `IServiceCollection` extension methods, cleaning up `Program.cs`. Ensure that the static class containing extension methods is named after the bounded context (e.g., `RoomAccessServiceCollectionExtensions` or `RoomAccessServices`), never a generic name like `DependencyInjection`.
+- Move dependency and settings registrations out of `Program.cs` and encapsulate them in static service collection extension methods named after the bounded context (e.g. `RoomAccessServiceCollectionExtensions` or `RoomAccessServices`).
+- **Constructor Logging Parameters**: Remove default null values (e.g., `= null`) from logger parameters in class/controller constructors (or primary constructors), making them required parameters.
 - **Application Contracts & Commands**: Split grouped application interface declarations into separate dedicated files under the `Contracts/` folder, and ensure the corresponding Command/Request record is defined in the same file directly below the interface.
 
 ### 2. DDD Model Normalization (from `cs-domain-driven-design.md`)
@@ -62,6 +63,7 @@ Execute the refactoring steps precisely based on the workspace rules:
   - Use `.Match(...)` or `.MatchAsync(...)` to handle outcomes at boundaries (e.g., in controllers).
 - Convert API endpoint methods to return `IResult` mapping monadic results to `Results.Ok(success)` or `Results.Problem(MapToProblemDetails(error))`.
 - **Time & UUID/Guid Generation**: Refactor direct references to `DateTime.UtcNow`, `DateTime.Now`, or `Guid.NewGuid()` in production code by introducing and injecting mockable provider interfaces (e.g., `IDateTimeProvider`, `IGuidProvider`).
+- **Logging Normalization**: Refactor logging calls to resolve CA1873 by wrapping expensive argument evaluation logging calls with `if (logger.IsEnabled(...))` guards or converting them to use `[LoggerMessage]` source-generator methods.
 
 ### 4. Naming Normalization (from `cs-naming.md` & `cs-architecture.md`)
 - Add `I` prefix to all interface names.

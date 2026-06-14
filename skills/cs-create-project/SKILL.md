@@ -64,6 +64,7 @@ Follow these strict design rules during creation:
 ### 2. Modern C# Features & Coding Style (from `cs-coding-style.md`)
 - Use **file-scoped namespaces** to reduce nesting.
 - Use **primary constructors** for dependency injection in classes/controllers.
+- **No Optional Loggers**: Never declare logger dependencies in constructors with default null values (e.g., `ILogger<T> logger = null` is forbidden). Loggers must be required dependencies.
 - Use **expression-bodied members (`=>`)** for single-expression methods.
 - Emphasize class immutability by using `required` and `readonly` fields.
 - **Inject via Extensions**: Always create `IServiceCollection` extension methods to encapsulate how settings and dependencies are injected. Keep `Program.cs` clean and free of individual service registrations. The static class containing the extension methods must be named after the bounded context (e.g. `RoomAccessServiceCollectionExtensions` or `RoomAccessServices`), never a generic name like `DependencyInjection` or `DependencyInjectionExtensions`.
@@ -100,6 +101,9 @@ Follow these strict design rules during creation:
 
 ### 8. Mockable Non-Deterministic Providers (from `cs-coding-style.md`)
 - **DateTime & Guids**: Never reference `DateTime.UtcNow` or `Guid.NewGuid()` directly in production code. Define interfaces (e.g., `IDateTimeProvider`, `IGuidProvider`) and inject them via constructor parameters to ensure they are easily mockable in tests.
+
+### 9. High-Performance Logging (from `cs-coding-style.md`)
+- **CA1873 Compliant Logging**: Avoid string interpolation inside log formats. When evaluating arguments (e.g., `items.Count()`, `string.Join`) for logs, always wrap the log in an `if (logger.IsEnabled(LogLevel.X))` check or use `[LoggerMessage]` source-generator methods to prevent expensive, unnecessary evaluation when logging is disabled.
 
 ---
 

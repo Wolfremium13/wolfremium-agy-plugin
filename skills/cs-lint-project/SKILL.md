@@ -41,6 +41,7 @@ Inspect each target file against the following specific rules:
 - **File-Scoped Namespaces**: Ensure namespaces use file-scoped syntax (e.g., `namespace X;` with no curly braces) as per `cs-coding-style.md`.
 - **Folder Structure**: Ensure files are organized in the `[BoundedContext]/[Action]/[Layer]` folder hierarchy (e.g., `Users/Register/Domain` or `Users/Register/Application`), with `Application/Contracts` containing contracts and `Application/UseCases` containing the implementations.
 - **Dependency Injection**: Ensure dependency and settings registration is encapsulated inside extension methods, keeping `Program.cs` clean and high-level. The name of the static registration class must be related to the bounded context (e.g., `RoomAccessServiceCollectionExtensions` or `RoomAccessServices`), never a generic name like `DependencyInjection`.
+- **Constructor Logging Parameters**: Ensure logger dependencies in class/controller constructors (or primary constructors) do not have default null values assigned (e.g., check for `= null`). Loggers must be required dependencies.
 - **Application Contracts & Commands**: Verify that a `Contracts/` folder is created on the application layer (`Application/Contracts/`). Verify that application interfaces are not grouped into a single file and that any associated Command/Request record is defined inside the same file in the `Contracts/` folder, directly below the contract interface definition.
 
 ### 2. Domain-Driven Design Invariants (from `cs-domain-driven-design.md`)
@@ -55,6 +56,7 @@ Inspect each target file against the following specific rules:
 - **Ports & Interfaces**: Ensure all port interface methods that can fail return `Either` or `EitherAsync` to manage errors functionally.
 - **Private Helper Methods**: Ensure complex transformations, mappings, or branches that do not fit cleanly in the main LINQ pipeline are extracted to private helper methods.
 - **Time & UUID/Guid Generation**: Ensure that random generations and datetime fetches (e.g., `DateTime.UtcNow`, `Guid.NewGuid()`) are never called directly in production code. Verify they are abstracted behind mockable interfaces (e.g., `IDateTimeProvider`, `IGuidProvider`) and injected.
+- **Logging & CA1873**: Verify that logging calls do not use string interpolation directly, and check that any evaluated or computed log arguments are guarded with `if (logger.IsEnabled(...))` checks or use `[LoggerMessage]` source generation.
 
 ### 4. Naming Conventions (from `cs-naming.md` & `cs-architecture.md`)
 - **Interfaces**: Check if interfaces are prefixed with `I` (e.g., `IInvoicePaymentClient`) and represent a business abstraction.
