@@ -54,6 +54,7 @@ Inspect each target file against the following specific rules:
 - **Monadic Bindings**: Ensure query/pipeline operations use LINQ query syntax or monadic methods (`Match`/`MatchAsync`), avoiding raw try-catch blocks or null-returns in application/domain layers.
 - **Ports & Interfaces**: Ensure all port interface methods that can fail return `Either` or `EitherAsync` to manage errors functionally.
 - **Private Helper Methods**: Ensure complex transformations, mappings, or branches that do not fit cleanly in the main LINQ pipeline are extracted to private helper methods.
+- **Time & UUID/Guid Generation**: Ensure that random generations and datetime fetches (e.g., `DateTime.UtcNow`, `Guid.NewGuid()`) are never called directly in production code. Verify they are abstracted behind mockable interfaces (e.g., `IDateTimeProvider`, `IGuidProvider`) and injected.
 
 ### 4. Naming Conventions (from `cs-naming.md` & `cs-architecture.md`)
 - **Interfaces**: Check if interfaces are prefixed with `I` (e.g., `IInvoicePaymentClient`) and represent a business abstraction.

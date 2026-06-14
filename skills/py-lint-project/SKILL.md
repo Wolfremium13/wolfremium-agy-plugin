@@ -50,6 +50,8 @@ Inspect each target file against the following specific rules:
 
 ### 3. Error Handling & Pipelines (from `py-architecture.md` & `py-coding-style.md`)
 - **Exceptions**: Ensure the code does not raise standard exceptions for domain validation or normal flow control. Validation must return `Result[T, Exception]`.
+- **Ports & Interfaces**: Ensure all port interface methods that can fail return `Result` to manage errors functionally.
+- **Time & UUID/Guid Generation**: Ensure that random generations and datetime fetches (e.g., `datetime.now()`, `datetime.utcnow()`, `uuid.uuid4()`) are never called directly in production code. Verify they are abstracted behind mockable interfaces (e.g., `DateTimeProvider`, `UUIDProvider`) and injected.
 - **Pipelines**: Ensure query/pipeline operations handle results via pythonic pattern matching (`match case`), avoiding unhandled Exception raising or null/None returns in domain/application layers.
 
 ### 4. Naming Conventions (from `py-naming.md`)

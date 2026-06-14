@@ -38,6 +38,12 @@ Before writing any code, the agent MUST review the information architecture and 
      - Status of each task (Pending/In Progress/Completed).
    - If the connection fails or the agent restarts, read this file to resume progress without starting over.
 
+4. **Mandatory Implementation Sequence**:
+   - The checklist in the plan and the actual implementation execution MUST strictly follow this domain-first sequence:
+     1. **Domain Layer & Tests**: Always start by creating the domain layer (Value Objects, Entities, Aggregates, and Port/Interface definitions). Write and run all unit tests for the domain models to verify invariants and factory methods before implementing other layers.
+     2. **Application Layer**: Next, implement use case contracts (Application interfaces), input DTOs/models, application services, and their mocking unit tests.
+     3. **Infrastructure Layer**: Finally, implement the infrastructure layer (concrete database repository/client adapters, database models/schemas, DI registration configurations, FastAPI routers, and background workers) and verify them using integration or scenario tests.
+
 ---
 
 ## Phase 2: Implementation Guidelines (Based on Rules)
@@ -81,6 +87,9 @@ Follow these strict design rules during creation:
 - Create **Test Data Builders** (e.g. `InvoiceIdBuilder`) to arrange test data cleanly.
 - Use `unittest.mock` or `mocker` to mock interface dependencies.
 - **Scenario Tests**: Put every scenario/E2E test in a dedicated module and file under a `scenarios/` directory. To prevent concurrency conflicts (especially when running in parallel), decorate them with `@pytest.mark.xdist_group(name="scenario_tests")` to run them sequentially.
+
+### 8. Mockable Non-Deterministic Providers (from `py-coding-style.md`)
+- **DateTime & UUIDs**: Never reference `datetime.now()`, `datetime.utcnow()`, or `uuid.uuid4()` directly in production code. Define abstract base class interfaces (e.g., `DateTimeProvider`, `UUIDProvider`) and inject them via constructor parameters to ensure they are easily mockable in tests.
 
 ---
 

@@ -256,4 +256,50 @@ public static class RoomAccessServiceCollectionExtensions
     }
 }
 ```
+
+---
+
+## 7. Deterministic Non-Deterministic Operations (Time & Random Generations)
+
+Direct dependency on non-deterministic system calls like `DateTime.UtcNow`, `DateTime.Now`, `Guid.NewGuid()`, or `Random` inside domain models, services, or use cases violates testability and predictability. All such generations must be abstractable and mockable.
+
+### 7.1 Abstracting DateTime and Guids
+- **Never call directly**: Never use `DateTime.UtcNow`, `DateTime.Now`, `Guid.NewGuid()` directly in production business logic.
+- **Use Interfaces**: Wrap these behind dedicated port interfaces in the domain or application layers.
+  - For system clock and time: Use `IDateTimeProvider` or `ISystemClock`.
+  - For unique identifiers: Use `IGuidProvider` or `IIdGenerator`.
+- **Dependency Injection**: Inject these providers into use cases, domain services, or factory methods that require them, allowing unit tests to stub or mock them to return stable, predictable values.
+
+#### Example Interface & Usage
+```csharp
+namespace Common.Billing.Shared.Domain.Ports;
+
+public interface IDateTimeProvider
+{
+    DateTime UtcNow { get; }
+}
+
+public interface IGuidProvider
+{
+    Guid NewGuid();
+}
+```
+
+```csharp
+namespace Common.Billing.Users.Register.Application.UseCases;
+
+public class RegisterUser(
+    IUserRepository userRepository,
+    IGuidProvider guidProvider,
+    IDateTimeProvider dateTimeProvider
+) : IRegisterUser
+{
+    public async Task<Either<Error, User>> Execute(string username, string email)
+    {
+        var userId = guidProvider.NewGuid();
+        var createdAt = dateTimeProvider.UtcNow;
+        // ...
+    }
+}
+```
 ```

@@ -195,3 +195,55 @@ async def process_payment(
                     detail=f"Gateway integration error: {str(err)}"
                 )
 ```
+
+---
+
+## 5. Deterministic Non-Deterministic Operations (Time & Random Generations)
+
+Direct dependency on non-deterministic system calls like `datetime.now()`, `uuid.uuid4()`, or `random` inside domain models, services, or use cases violates testability and predictability. All such generations must be abstractable and mockable.
+
+### 5.1 Abstracting DateTime and UUIDs
+- **Never call directly**: Never use `datetime.utcnow()`, `datetime.now()`, `uuid.uuid4()` directly in production business logic.
+- **Use Interfaces**: Wrap these behind dedicated port interfaces (Abstract Base Classes) in the domain or application layers.
+  - For system clock and time: Use `DateTimeProvider` or `SystemClock`.
+  - For unique identifiers: Use `UUIDProvider` or `IdGenerator`.
+- **Dependency Injection**: Inject these providers into use cases, domain services, or factory methods that require them, allowing unit tests to stub or mock them to return stable, predictable values.
+
+#### Example Interface & Usage
+```python
+from abc import ABC, abstractmethod
+from datetime import datetime
+from uuid import UUID
+
+class DateTimeProvider(ABC):
+    @abstractmethod
+    def utc_now(self) -> datetime:
+        pass
+
+class UUIDProvider(ABC):
+    @abstractmethod
+    def new_uuid(self) -> UUID:
+        pass
+```
+
+```python
+from uuid import UUID
+from datetime import datetime
+from src.billing.shared.result import Result
+
+class RegisterUser:
+    def __init__(
+        self,
+        user_repository: UserRepository,
+        uuid_provider: UUIDProvider,
+        date_time_provider: DateTimeProvider
+    ) -> None:
+        self._user_repository = user_repository
+        self._uuid_provider = uuid_provider
+        self._date_time_provider = date_time_provider
+
+    async def execute(self, username: str, email: str) -> Result[User, Exception]:
+        user_id: UUID = self._uuid_provider.new_uuid()
+        created_at: datetime = self._date_time_provider.utc_now()
+        # ...
+```

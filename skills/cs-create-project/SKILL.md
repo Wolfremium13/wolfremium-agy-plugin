@@ -42,6 +42,12 @@ Before writing any code, the agent MUST review the information architecture and 
      - Status of each task (Pending/In Progress/Completed).
    - If the connection fails or the agent restarts, read this file to resume progress without starting over.
 
+4. **Mandatory Implementation Sequence**:
+   - The checklist in the plan and the actual implementation execution MUST strictly follow this domain-first sequence:
+     1. **Domain Layer & Tests**: Always start by creating the domain layer (Value Objects, Entities, Aggregates, and Port/Interface definitions). Write and run all unit tests for the domain models to verify invariants and factory methods before implementing other layers.
+     2. **Application Layer**: Next, implement use case contracts (Application interfaces), input command records, application services, and their mocking unit tests.
+     3. **Infrastructure Layer**: Finally, implement the infrastructure layer (concrete database repository/client adapters, EF Core configurations, DI registration extensions, web API controllers, and background workers) and verify them using integration or scenario tests.
+
 ---
 
 ## Phase 2: Implementation Guidelines (Based on Rules)
@@ -91,6 +97,9 @@ Follow these strict design rules during creation:
 - **Infrastructure**: Test infrastructure components via **integration tests** using in-memory databases (for EF Core) or **Testcontainers** for specific external services (e.g. Postgres, RabbitMQ, Redis).
 - **Domain**: Test Domain Models (Entities, Aggregates) and Value Objects via **unit tests** to validate business invariants, state transition rules, and factory methods without external mocks.
 - **Scenario Tests**: Put every scenario test in a dedicated class and file under a `Scenarios/` directory. To prevent concurrency conflicts (e.g., on databases or ports), always decorate scenario test classes with `[Collection("ScenarioTests")]` to run them sequentially.
+
+### 8. Mockable Non-Deterministic Providers (from `cs-coding-style.md`)
+- **DateTime & Guids**: Never reference `DateTime.UtcNow` or `Guid.NewGuid()` directly in production code. Define interfaces (e.g., `IDateTimeProvider`, `IGuidProvider`) and inject them via constructor parameters to ensure they are easily mockable in tests.
 
 ---
 

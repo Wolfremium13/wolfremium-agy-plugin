@@ -52,7 +52,8 @@ Execute the refactoring steps precisely based on the workspace rules:
 ### 3. Error Handling & Functional Pipeline Normalization (from `py-architecture.md` & `py-coding-style.md`)
 - Replace standard exceptions (like `raise ValueError(...)`) in Use Cases, Domain Models, or API Routers with monadic `Result` returns.
 - Rewrite procedural methods to use Python pattern matching (`match case`) to branch on success or failure results.
-- Convert FastAPI endpoint methods to return DTO schemas mapping results, raising `HTTPException` on monadic `Failure`.
+- Convert API routers to return Pydantic models mapping Success results, raising FastAPI `HTTPException` on Failure results.
+- **Time & UUID/Guid Generation**: Refactor direct references to `datetime.now()`, `datetime.utcnow()`, or `uuid.uuid4()` in production code by introducing and injecting mockable provider interfaces (e.g., `DateTimeProvider`, `UUIDProvider`).
 
 ### 4. Naming Normalization (from `py-naming.md`)
 - Remove the `I` prefix from all interface/port classes, using abstract base classes (`abc.ABC`).

@@ -61,6 +61,7 @@ Execute the refactoring steps precisely based on the workspace rules:
   - Use LINQ query syntax (`from ... in ... select ...`) to chain operations returning `Either` or `EitherAsync`.
   - Use `.Match(...)` or `.MatchAsync(...)` to handle outcomes at boundaries (e.g., in controllers).
 - Convert API endpoint methods to return `IResult` mapping monadic results to `Results.Ok(success)` or `Results.Problem(MapToProblemDetails(error))`.
+- **Time & UUID/Guid Generation**: Refactor direct references to `DateTime.UtcNow`, `DateTime.Now`, or `Guid.NewGuid()` in production code by introducing and injecting mockable provider interfaces (e.g., `IDateTimeProvider`, `IGuidProvider`).
 
 ### 4. Naming Normalization (from `cs-naming.md` & `cs-architecture.md`)
 - Add `I` prefix to all interface names.
