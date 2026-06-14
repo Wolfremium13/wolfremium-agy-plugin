@@ -39,9 +39,9 @@ Inspect each target file against the following specific rules:
 - **Namespaces**: Verify that namespaces exactly match the folder structure:
   - Expect: `namespace Common.[DomainSubdomain].[BoundedContext].[Action].[Layer].[SubFolder];`
 - **File-Scoped Namespaces**: Ensure namespaces use file-scoped syntax (e.g., `namespace X;` with no curly braces) as per `cs-coding-style.md`.
-- **Folder Structure**: Ensure files are organized in the `[BoundedContext]/[Action]/[Layer]` folder hierarchy (e.g., `Users/Register/Domain` or `Users/Register/Application`).
-- **Dependency Injection**: Ensure dependency and settings registration is encapsulated inside extension methods, keeping `Program.cs` clean and high-level.
-- **Application Contracts & Commands**: Verify that application interfaces are not grouped into a single file and that any associated Command/Request record is defined in the same file, directly below the contract interface definition.
+- **Folder Structure**: Ensure files are organized in the `[BoundedContext]/[Action]/[Layer]` folder hierarchy (e.g., `Users/Register/Domain` or `Users/Register/Application`), with `Application/Contracts` containing contracts and `Application/UseCases` containing the implementations.
+- **Dependency Injection**: Ensure dependency and settings registration is encapsulated inside extension methods, keeping `Program.cs` clean and high-level. The name of the static registration class must be related to the bounded context (e.g., `RoomAccessServiceCollectionExtensions` or `RoomAccessServices`), never a generic name like `DependencyInjection`.
+- **Application Contracts & Commands**: Verify that a `Contracts/` folder is created on the application layer (`Application/Contracts/`). Verify that application interfaces are not grouped into a single file and that any associated Command/Request record is defined inside the same file in the `Contracts/` folder, directly below the contract interface definition.
 
 ### 2. Domain-Driven Design Invariants (from `cs-domain-driven-design.md`)
 - **Domain Models**: Are entities/aggregates defined as `class`? Are their constructors `private`? Do they use static factory methods (`Create`) returning `Either<Error, T>`?

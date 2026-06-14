@@ -24,8 +24,9 @@ Application Services coordinate domain interactions using functional query pipel
 - If a complex transformation, type mapping, or error mapping (`Bind`/`Match`) does not fit cleanly inside a LINQ pipeline, extract it to a **private method**. Do not clutter the pipeline with inline complex closures.
 
 ### 2.2 Application Contracts & Commands
-- **Single File per Contract**: Always declare exactly one use case/service interface (contract) per file. Do not bundle multiple unrelated use case interfaces together.
-- **Commands in Contract Files**: Define the associated input Command or Request record directly in the same file as the interface contract, positioned immediately below the interface definition.
+- **Contracts Folder**: Ensure a `Contracts/` folder is created on the application layer (`Application/Contracts/`) to contain the use case contracts.
+- **Single File per Contract**: Always declare exactly one use case/service interface (contract) per file. Each contract must have its own dedicated file inside the `Contracts/` folder. Do not bundle multiple unrelated use case interfaces together.
+- **Commands in Contract Files**: Define the associated input Command or Request record directly in the same file as the interface contract, positioned immediately below the interface definition (e.g., place the interface first, and the command below it).
 
 #### Example Contract File (`IRegisterUser.cs`)
 ```csharp
@@ -229,4 +230,30 @@ public static class RegisterServiceCollectionExtensions
         return services;
     }
 }
+
+### Bounded Context DI Registration Example
+
+When registering dependencies (repositories, use cases, etc.) for a bounded context in program files/extension classes, do NOT use generic names like `DependencyInjection` for the static class. The name of the static class must be related to the bounded context (e.g., `RoomAccessServiceCollectionExtensions` or `RoomAccessServices`).
+
+Example:
+
+```csharp
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Common.RoomAccess.Infrastructure.Settings;
+
+public static class RoomAccessServiceCollectionExtensions
+{
+    public static void AddRoomAccessServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IEstimationRoomRepository, InMemoryEstimationRoomRepository>();
+        
+        services.AddTransient<ICreateRoomUseCase, CreateRoomUseCase>();
+        services.AddTransient<IRequestToJoinUseCase, RequestToJoinUseCase>();
+        services.AddTransient<IApproveJoinRequestUseCase, ApproveJoinRequestUseCase>();
+        services.AddTransient<IRejectJoinRequestUseCase, RejectJoinRequestUseCase>();
+        services.AddTransient<IDisconnectModeratorUseCase, DisconnectModeratorUseCase>();
+    }
+}
+```
 ```

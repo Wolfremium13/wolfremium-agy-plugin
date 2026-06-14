@@ -41,9 +41,9 @@ Execute the refactoring steps precisely based on the workspace rules:
 - Replace block-scoped namespaces (with curly braces) with file-scoped namespaces (e.g., `namespace Common.Domain;`).
 - Adjust the namespace value to match the exact directory path using action-based vertical feature slicing:
   `namespace Common.[DomainSubdomain].[BoundedContext].[Action].[Layer].[SubFolder];`
-- Move files to conform to the `[BoundedContext]/[Action]/[Layer]` folder hierarchy (e.g., `Users/Register/Domain`).
-- Encapsulate all settings and dependency injections into `IServiceCollection` extension methods, cleaning up `Program.cs`.
-- **Application Contracts & Commands**: Split grouped application interface declarations into separate dedicated files, and ensure the corresponding Command/Request record is defined in the same file directly below the interface.
+- Move files to conform to the `[BoundedContext]/[Action]/[Layer]` folder hierarchy (e.g., `Users/Register/Domain` or `Users/Register/Application`), ensuring `Application/Contracts` holds use case contracts.
+- Encapsulate all settings and dependency injections into `IServiceCollection` extension methods, cleaning up `Program.cs`. Ensure that the static class containing extension methods is named after the bounded context (e.g., `RoomAccessServiceCollectionExtensions` or `RoomAccessServices`), never a generic name like `DependencyInjection`.
+- **Application Contracts & Commands**: Split grouped application interface declarations into separate dedicated files under the `Contracts/` folder, and ensure the corresponding Command/Request record is defined in the same file directly below the interface.
 
 ### 2. DDD Model Normalization (from `cs-domain-driven-design.md`)
 - Change Domain Entities and Aggregates from `struct` or `record` to `class` where appropriate.

@@ -49,6 +49,7 @@ To maximize maintainability and keep files small, the project uses a `[BoundedCo
 │               │   ├── Models/      # Entities and Value Objects specific to this action
 │               │   └── Ports/       # Interfaces for external dependencies returning Either
 │               ├── Application/     # Orchestrates domain actions
+│               │   ├── Contracts/   # Use case contracts (interfaces) and associated commands/queries
 │               │   └── UseCases/    # Application logic, workflows, & command/query handlers
 │               └── Infrastructure/  # Framework-specific implementations
 │                   ├── Http/        # API clients calling external systems
@@ -88,7 +89,8 @@ To maximize maintainability and keep files small, the project uses a `[BoundedCo
 - **Clean Program.cs**: Do not register individual services or parse settings directly in `Program.cs`. Keep `Program.cs` high-level and clean by invoking these extension methods.
 
 ### 2.4 Application Contracts & Commands
-- **Do Not Group Contracts**: Do not group multiple application/use case contracts (interfaces) in a single file. Each contract must have its own dedicated file (e.g., `IRegisterUser.cs`).
+- **Contracts Folder**: Ensure a `Contracts/` folder is created on the application layer (`Application/Contracts/`) to contain the use case contracts.
+- **Do Not Group Contracts**: Do not group multiple application/use case contracts (interfaces) in a single file. Each contract must have its own dedicated file (e.g., `IRegisterUser.cs`) inside the `Contracts/` folder.
 - **Command Positioning**: Define the Command or Request record/DTO associated with a specific use case contract directly within the same file, positioned immediately below the contract interface definition (e.g., place `RegisterUserCommand` right below `IRegisterUser`).
 
 ---

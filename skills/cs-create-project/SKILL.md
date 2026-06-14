@@ -16,6 +16,7 @@ Before writing any code, the agent MUST review the information architecture and 
    - Verify where the new components fit within the standard directory layout:
      - Domain models in `Common/[DomainSubdomain]/[BoundedContext]/Domain/Models`
      - Domain ports in `Common/[DomainSubdomain]/[BoundedContext]/Domain/Ports`
+     - Contracts in `Common/[DomainSubdomain]/[BoundedContext]/Application/Contracts`
      - Use cases in `Common/[DomainSubdomain]/[BoundedContext]/Application/UseCases`
      - Infrastructure adapters in `Common/[DomainSubdomain]/[BoundedContext]/Infrastructure/`
      - Web controllers in `DomainProject.Internal.Web/Controllers/V[Number]/[Feature]`
@@ -59,9 +60,9 @@ Follow these strict design rules during creation:
 - Use **primary constructors** for dependency injection in classes/controllers.
 - Use **expression-bodied members (`=>`)** for single-expression methods.
 - Emphasize class immutability by using `required` and `readonly` fields.
-- **Inject via Extensions**: Always create `IServiceCollection` extension methods to encapsulate how settings and dependencies are injected. Keep `Program.cs` clean and free of individual service registrations.
+- **Inject via Extensions**: Always create `IServiceCollection` extension methods to encapsulate how settings and dependencies are injected. Keep `Program.cs` clean and free of individual service registrations. The static class containing the extension methods must be named after the bounded context (e.g. `RoomAccessServiceCollectionExtensions` or `RoomAccessServices`), never a generic name like `DependencyInjection` or `DependencyInjectionExtensions`.
 - **Avoid Comments**: Keep code free of comments. In unit/integration tests, never write comments (like `// Arrange`, `// Act`, `// Assert`); separate logical phases using empty lines.
-- **Application Contracts & Commands**: Do not group all application interfaces in a single file; each contract must have its own dedicated file. The associated input Command/Request record must be declared in the same file, directly below the contract interface.
+- **Application Contracts & Commands**: Ensure a `Contracts/` folder is created on the application layer (`Application/Contracts/`) to contain the use case contracts. Do not group all application interfaces in a single file; each contract must have its own dedicated file inside the `Contracts/` folder. The associated input Command/Request record must be declared in the same file, directly below the contract interface.
 
 ### 3. Monadic Control Flow (from `cs-architecture.md` & `cs-coding-style.md`)
 - **No Exceptions**: Do not throw or catch exceptions for domain validation or error handling. All failure paths must use `Either` and return `Error`. The **only** exception is inside test projects (specifically within Test Data Builders), which may throw exceptions when unable to construct a valid object.
