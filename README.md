@@ -4,28 +4,59 @@ This repository houses central, reusable standards, rules, and skills for autono
 
 ---
 
-## 📂 Repository Structure
+## 📂 Repository Layout & Component Links
 
-The project has the following layout:
+*   **Plugin Manifest**:
+    *   [`plugin.json`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/plugin.json) - Defines the plugin metadata (name, version, description).
 
-*   **`plugin.json`**: The plugin manifest file identifying this directory as an Antigravity plugin.
-*   **[agents/](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/agents)**: Specialized subagent definition templates:
-    *   `cs-developer` & `cs-reviewer`: C# specialized developer and reviewer agents.
-    *   `py-developer` & `py-reviewer`: Python specialized developer and reviewer agents.
-*   **[skills/](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/skills)**: Custom skills implementing Clean Architecture, DDD, and language-specific workflows.
-*   **[rules/](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules)**: Codebase rules enforcing guidelines like architecture, coding style, naming, and testing (prefixed with `cs-` or `py-`).
+*   **🤖 Specialized Subagents**:
+    Specialized agent profiles containing model configurations, rules, and custom skills:
+    *   **C# Agents**:
+        *   [`cs-developer`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/agents/cs-developer/agent.json) - Profile for building Clean Architecture & DDD components in C#.
+        *   [`cs-reviewer`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/agents/cs-reviewer/agent.json) - Profile for auditing C# codebases for compliance.
+    *   **Python Agents**:
+        *   [`py-developer`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/agents/py-developer/agent.json) - Profile for building Clean Architecture & DDD components in Python.
+        *   [`py-reviewer`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/agents/py-reviewer/agent.json) - Profile for auditing Python codebases for compliance.
+
+*   **⚡ Custom Skills**:
+    Executable workflows with detailed instruction manuals and script bindings:
+    *   **C# Skills**:
+        *   [`cs-create-project`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/skills/cs-create-project/SKILL.md) - Plan and scaffold projects and components.
+        *   [`cs-lint-project`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/skills/cs-lint-project/SKILL.md) - Scan codebase and enforce compliance rules.
+        *   [`cs-normalize-project`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/skills/cs-normalize-project/SKILL.md) - Automatically format and refactor files.
+    *   **Python Skills**:
+        *   [`py-create-project`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/skills/py-create-project/SKILL.md) - Plan and scaffold projects and packages.
+        *   [`py-lint-project`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/skills/py-lint-project/SKILL.md) - Scan codebase and enforce compliance rules.
+        *   [`py-normalize-project`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/skills/py-normalize-project/SKILL.md) - Automatically format and refactor files.
+
+*   **📘 Architectural & Design Rules**:
+    Mandatory design rules loaded directly into agent contexts:
+    *   **C# Rules**:
+        *   [`cs-architecture.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/cs-architecture.md)
+        *   [`cs-coding-style.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/cs-coding-style.md)
+        *   [`cs-comments.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/cs-comments.md)
+        *   [`cs-domain-driven-design.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/cs-domain-driven-design.md)
+        *   [`cs-naming.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/cs-naming.md)
+        *   [`cs-testing.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/cs-testing.md)
+    *   **Python Rules**:
+        *   [`py-architecture.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/py-architecture.md)
+        *   [`py-coding-style.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/py-coding-style.md)
+        *   [`py-comments.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/py-comments.md)
+        *   [`py-domain-driven-design.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/py-domain-driven-design.md)
+        *   [`py-naming.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/py-naming.md)
+        *   [`py-testing.md`](file:///home/wolfremium/Documents/kevin-hierro/wolfremium-agents-configuration/rules/py-testing.md)
 
 ---
 
-## 🚀 Getting Started (Installation & Usage)
+## 🚀 Installation & Usage
 
-To install this plugin on your local **Antigravity CLI** environment:
+To install this plugin globally on your local **Antigravity CLI** environment:
 
-1.  **Clone the repository** from GitHub:
+1.  **Clone the repository**:
     ```bash
     git clone https://github.com/your-username/wolfremium-agents-configuration.git
     ```
-2.  **Install the plugin** using the Antigravity CLI:
+2.  **Install the plugin**:
     ```bash
     agy plugin install ./wolfremium-agents-configuration
     ```
