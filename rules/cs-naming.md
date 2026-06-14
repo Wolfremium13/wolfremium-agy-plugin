@@ -53,3 +53,6 @@ Consistency in naming ensures readability across diverse modules:
 
 ### 2.8 Enforce Strict Consistency and Reject Aliases
 - Use the exact same name for a specific concept throughout the entire codebase. Do not use synonyms, aliases, or alternative translations for the same domain concept.
+
+### 2.9 Do Not Use Acronyms
+- Avoid using acronyms or abbreviations in naming. Spell out words fully to ensure clarity, reduce ambiguity, and maintain readability across the codebase (e.g., use `UserIdentifier` instead of `UID`, or `Request` instead of `Req`).

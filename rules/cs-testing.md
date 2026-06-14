@@ -11,6 +11,9 @@ The testing strategy focuses on isolated, fast-running unit tests and integratio
 - **Shouldly**: Human-readable, fluent assertions (e.g., `value.ShouldBe(expected)`).
 - **NSubstitute**: Clean, type-safe mocking framework for ports and dependencies.
 
+### Crucial Constraints
+- **No Comments in Tests**: Do not write comments in unit tests or integration tests to label sections (such as `// Arrange`, `// Act`, or `// Assert`). Instead, separate these logical phases strictly with empty lines (vertical whitespace).
+
 ---
 
 ## 2. Value Object Unit Tests
@@ -43,7 +46,7 @@ public class InvoiceIdShould
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    [InlineData("123")] // Too short
+    [InlineData("123")]
     public void FailCreationWhenValueIsInvalid(string invalidId)
     {
         _ = InvoiceId.Create(invalidId).Match(
@@ -109,12 +112,10 @@ namespace Common.Test.Billing.InvoiceGeneration.Application.UseCases;
 
 public class ProcessInvoicePaymentShould
 {
-    // Dependencies
     private readonly IBillingTokenCache _tokenCache = Substitute.For<IBillingTokenCache>();
     private readonly IInvoicePaymentClient _paymentClient = Substitute.For<IInvoicePaymentClient>();
     private readonly IPaymentGatewayClient _gatewayClient = Substitute.For<IPaymentGatewayClient>();
     
-    // System Under Test (SUT)
     private readonly ProcessInvoicePayment _useCase;
     private readonly string _invoiceId = new InvoiceIdBuilder().Build().ToString();
 
@@ -126,19 +127,16 @@ public class ProcessInvoicePaymentShould
     [Fact]
     public async Task RetrieveTokenFromCacheWhenItExists()
     {
-        // Arrange
-        var cachedToken = "TOKEN-123456";
+        const string cachedToken = "TOKEN-123456";
         _tokenCache.FindBy(Arg.Any<InvoiceId>(), Arg.Any<string>()).Returns(cachedToken);
 
-        // Act
         var result = await _useCase.Process(_invoiceId, 150.00m);
 
-        // Assert
         result.Match(
             token =>
             {
                 token.ToString().ShouldBe(cachedToken);
-                // Ensure no external API clients were invoked
+
                 _paymentClient.DidNotReceive().RequestToken(Arg.Any<InvoiceId>());
                 _gatewayClient.DidNotReceive().ExecuteTransaction(Arg.Any<string>(), Arg.Any<decimal>());
             },
@@ -149,7 +147,6 @@ public class ProcessInvoicePaymentShould
     [Fact]
     public async Task FetchTokenFromApiAndSaveWhenNotInCache()
     {
-        // Arrange
         var newApiToken = "NEW-TOKEN-789";
         _tokenCache.FindBy(Arg.Any<InvoiceId>(), Arg.Any<string>())
             .Returns(Error.New(new ResourceNotFoundException("Cache miss")));
@@ -158,15 +155,13 @@ public class ProcessInvoicePaymentShould
         _gatewayClient.ExecuteTransaction(Arg.Any<string>(), Arg.Any<decimal>()).Returns(new PaymentReceipt("TX-777", "Success", DateTime.UtcNow));
         _tokenCache.Save(Arg.Any<InvoiceId>(), Arg.Any<string>(), Arg.Any<string>()).Returns(Unit.Default);
 
-        // Act
         var result = await _useCase.Process(_invoiceId, 250.00m);
 
-        // Assert
         result.Match(
             token =>
             {
                 token.ToString().ShouldBe(newApiToken);
-                // Verify interactions
+
                 _paymentClient.Received(1).RequestToken(Arg.Any<InvoiceId>());
                 _tokenCache.Received(1).Save(Arg.Any<InvoiceId>(), newApiToken, "test-env");
             },
@@ -174,4 +169,22 @@ public class ProcessInvoicePaymentShould
         );
     }
 }
-```
+
+---
+
+## 5. Testing Strategy by Layer
+
+Testing is structured to balance speed and confidence:
+
+### 5.1 Web API Controllers
+- **Unit Tests with Mocks**: API Controllers must be tested using unit tests with mock representations of the external contract / application use cases using **NSubstitute**.
+- **Scope**: Focus on validating routing, input parsing, error mapping to HTTP responses, and ensuring the correct application contract is called.
+
+### 5.2 Infrastructure Layer
+- **Integration Tests**: Most infrastructure-level components (e.g. database repositories, API clients, cache wrappers) must be tested using integration tests rather than unit tests.
+- **Entity Framework**: Use an in-memory database configuration (e.g., EF Core InMemory provider) to test repositories.
+- **Specific Infrastructure & Services (Testcontainers)**: For complex external integration pieces (e.g., PostgreSQL specific features, Redis, RabbitMQ, Kafka), use **Testcontainers** to spin up actual containerized environments dynamically for tests.
+
+### 5.3 Domain Layer
+- **Unit Tests for Domain Models**: Domain Models (Entities, Aggregates) and Value Objects must be thoroughly tested using unit tests.
+- **Scope**: Validate all business invariants, state transition rules, and factory methods (`Create`), ensuring both success paths and error states (represented as Left values in `Either` monads) are fully covered. Do not use mocks or external dependencies when testing the domain layer.

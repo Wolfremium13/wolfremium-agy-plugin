@@ -39,8 +39,11 @@ Execute the refactoring steps precisely based on the workspace rules:
 
 ### 1. Namespace & File-Scoped Namespace Conversion (from `cs-architecture.md` & `cs-coding-style.md`)
 - Replace block-scoped namespaces (with curly braces) with file-scoped namespaces (e.g., `namespace Common.Domain;`).
-- Adjust the namespace value to match the exact directory path:
-  `namespace Common.[DomainSubdomain].[BoundedContext].[Layer].[SubFolder];`
+- Adjust the namespace value to match the exact directory path using action-based vertical feature slicing:
+  `namespace Common.[DomainSubdomain].[BoundedContext].[Action].[Layer].[SubFolder];`
+- Move files to conform to the `[BoundedContext]/[Action]/[Layer]` folder hierarchy (e.g., `Users/Register/Domain`).
+- Encapsulate all settings and dependency injections into `IServiceCollection` extension methods, cleaning up `Program.cs`.
+- **Application Contracts & Commands**: Split grouped application interface declarations into separate dedicated files, and ensure the corresponding Command/Request record is defined in the same file directly below the interface.
 
 ### 2. DDD Model Normalization (from `cs-domain-driven-design.md`)
 - Change Domain Entities and Aggregates from `struct` or `record` to `class` where appropriate.
@@ -51,27 +54,33 @@ Execute the refactoring steps precisely based on the workspace rules:
 - Convert DTOs and events to `record` types.
 
 ### 3. Error Handling & Functional Pipeline Normalization (from `cs-architecture.md` & `cs-coding-style.md`)
-- Replace standard exceptions (like `throw new ArgumentException(...)`) in Use Cases, Domain Models, or API Controllers with LanguageExt monadic returns.
+- Replace standard exceptions (like `throw new ArgumentException(...)`) in Use Cases, Domain Models, or API Controllers with LanguageExt monadic returns. Standard exception handling is only allowed in test builders.
+- Ensure all Port interfaces manage and return `Either` or `EitherAsync` for error handling.
+- Extract complex transitions, mappings, or logic from LINQ queries into private helper methods.
 - Rewrite procedural methods to use functional pipelines:
   - Use LINQ query syntax (`from ... in ... select ...`) to chain operations returning `Either` or `EitherAsync`.
   - Use `.Match(...)` or `.MatchAsync(...)` to handle outcomes at boundaries (e.g., in controllers).
 - Convert API endpoint methods to return `IResult` mapping monadic results to `Results.Ok(success)` or `Results.Problem(MapToProblemDetails(error))`.
 
-### 4. Naming Normalization (from `cs-naming.md`)
+### 4. Naming Normalization (from `cs-naming.md` & `cs-architecture.md`)
 - Add `I` prefix to all interface names.
-- Remove generic prefixes/suffixes like `Impl` or `Base` from infrastructure classes. Prefix them with specific tech names (e.g., rename `DocumentRepositoryImpl` to `PostgresDocumentRepository`).
+- Remove generic prefixes/suffixes like `Impl` or `Base` from infrastructure classes. Prefix them with specific tech names (e.g., rename `UserRepositoryImpl` to `PostgresUserRepository`).
 - Rename any classes using catch-all words (like `Manager`, `Helper`, `Processor`, `Engine`, `Utils`) to names representing concrete business intents.
+- **No Acronyms**: Replace acronyms and abbreviations with fully spelled-out names (e.g., rename `UID` to `UserIdentifier`, `Req` to `Request`).
+- **Web Controllers**: Ensure each controller class exposes exactly **one** action method. Rename the controller file and class to `<original-name><action>Should.cs` (e.g., `UserRegisterShould.cs`).
 
 ### 5. Comment Cleanup (from `cs-comments.md`)
-- Delete comments that explain "how" the code works or repeat what the code says.
+- Avoid comments as much as possible. Delete comments that explain "how" the code works or repeat what the code says.
 - If a comment explains what a block of code does, extract that block into a well-named helper function and delete the comment.
 - Retain or write clear interface comments describing preconditions, exceptions, side-effects, and returns.
 
-### 6. Test & Test Data Builder Normalization (from `cs-testing.md`)
+### 6. Test & Test Data Builder Normalization (from `cs-testing.md` & `cs-comments.md`)
 - Rename test classes to `[ClassName]Should` and target test methods to PascalCase.
 - Convert test assertions to Shouldly fluent syntax (`value.ShouldBe(...)`).
 - Implement NSubstitute for mocks (`Substitute.For<T>()`, `Received()`, `DidNotReceive()`).
-- Refactor complex test setups into Test Data Builders.
+- Refactor complex test setups into Test Data Builders (which may throw exceptions if configured invalidly).
+- **Remove Comments in Tests**: Delete all comments (such as `// Arrange`, `// Act`, `// Assert`, and descriptions) from unit/integration tests, using empty lines instead.
+- **Testing Strategy**: Align test scopes (unit test controllers with NSubstitute mocks; integration test infrastructure using EF in-memory or Testcontainers; unit test domain models/value objects for business invariants).
 
 ---
 

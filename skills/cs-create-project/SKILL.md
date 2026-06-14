@@ -47,40 +47,48 @@ Before writing any code, the agent MUST review the information architecture and 
 
 Follow these strict design rules during creation:
 
-### 1. DDD & Encapsulation Rules (from `cs-domain-driven-design.md`)
+### 1. DDD & Encapsulation Rules (from `cs-domain-driven-design.md` & `cs-architecture.md`)
 - **Entities/Aggregates**: Use standard C# `class`. Keep constructors `private`. Use `public static Either<Error, T> Create(...)` factory methods. Never expose public setters.
 - **Value Objects**: Use immutable `class` or `record`. All internal fields must be `readonly`. Instantiation must go through private constructors and `public static Either<Error, T> Create(...)` factory methods. Protect all invariants.
 - **Events & DTOs**: Use C# `record` types to represent immutable data payloads.
 - **Repositories**: Define repo interfaces (ports) in the `Domain/Ports` layer. Implement them in the `Infrastructure` layer.
+- **Folder Structure**: Organize files using `[BoundedContext]/[Action]/[Layer]` format (e.g., `Users/Register/Domain` or `Users/Register/Application`). This keeps files small and maintainable.
 
 ### 2. Modern C# Features & Coding Style (from `cs-coding-style.md`)
 - Use **file-scoped namespaces** to reduce nesting.
 - Use **primary constructors** for dependency injection in classes/controllers.
 - Use **expression-bodied members (`=>`)** for single-expression methods.
 - Emphasize class immutability by using `required` and `readonly` fields.
+- **Inject via Extensions**: Always create `IServiceCollection` extension methods to encapsulate how settings and dependencies are injected. Keep `Program.cs` clean and free of individual service registrations.
+- **Avoid Comments**: Keep code free of comments. In unit/integration tests, never write comments (like `// Arrange`, `// Act`, `// Assert`); separate logical phases using empty lines.
+- **Application Contracts & Commands**: Do not group all application interfaces in a single file; each contract must have its own dedicated file. The associated input Command/Request record must be declared in the same file, directly below the contract interface.
 
 ### 3. Monadic Control Flow (from `cs-architecture.md` & `cs-coding-style.md`)
-- Do not throw exceptions for domain validation. Use `LanguageExt` monadic control flow.
-- Return `Either<Error, T>` or `EitherAsync<Error, T>`.
-- Use LINQ query syntax (`from ... in ... select ...`) for pipeline execution.
+- **No Exceptions**: Do not throw or catch exceptions for domain validation or error handling. All failure paths must use `Either` and return `Error`. The **only** exception is inside test projects (specifically within Test Data Builders), which may throw exceptions when unable to construct a valid object.
+- **Ports return Either**: All port interfaces must return `Either<Error, T>` or `EitherAsync<Error, T>` to manage error handling.
+- **LINQ Queries & Private Helpers**: Use LINQ query syntax (`from ... in ... select ...`) for pipeline execution. Use private helper methods to encapsulate transitions, maps, or branches that do not fit cleanly within LINQ.
 
-### 4. Naming Conventions (from `cs-naming.md`)
+### 4. Naming Conventions (from `cs-naming.md` & `cs-architecture.md`)
 - Interfaces prefixed with `I` (e.g., `IInvoicePaymentClient`).
-- Infrastructure classes prefixed with specific technology/protocol, never generic suffixes like `Impl` (e.g., `PostgresDocumentRepository` instead of `DocumentRepositoryImpl`).
-- Unit test classes named `[ClassName]Should` (e.g., `PaymentProcessorShould`).
-- No generic, catch-all words (no `Manager`, `Helper`, `Processor`, `Engine`, `Utils`). Use precise domain concepts.
+- Infrastructure classes prefixed with specific technology/protocol, never generic suffixes like `Impl` (e.g., `PostgresUserRepository` instead of `UserRepositoryImpl`).
+- Unit test classes named `[ClassName]Should` (e.g., `UserRegisterShould`).
+- **No Acronyms**: Avoid using acronyms in names (e.g., use `UserIdentifier` instead of `UID`, or `Request` instead of `Req`). Spell out concepts fully.
+- **Web Controllers**: Must contain only **one** action method. Name the controller file and class following the pattern `<original-name><action>Should.cs` (e.g., `UserRegisterShould.cs` under the directory `Users/V1/`).
 
 ### 5. Centralized Error Handling (from `cs-coding-style.md`)
-- Use static error holder classes with nested custom exception classes extending `Exception` (e.g., `BillingErrors.ClientValidationException`).
+- Use static error holder classes with nested custom exception classes extending `Exception` (e.g., `BillingErrors.ClientValidationException`) to wrap LanguageExt errors.
 
 ### 6. Web Controllers & Workers (from `cs-coding-style.md`)
 - Web controllers must specify routing, OpenAPI endpoints metadata via attributes (`Produces`, `EndpointSummary`, `EndpointDescription`, `ProducesResponseType`).
 - Map pipelines to `IResult` via `.Match(...)` or `.MatchAsync(...)` using `Results.Ok` and `Results.Problem`.
 
-### 7. Unit Testing (from `cs-testing.md`)
+### 7. Unit & Integration Testing (from `cs-testing.md`)
 - Create unit tests using **xUnit**, **Shouldly** (fluent assertions), and **NSubstitute** (mocking).
 - Assert both success and failure (invalid boundary) states for value objects.
-- Create **Test Data Builders** (e.g., `InvoiceIdBuilder`) to arrange test data cleanly.
+- Create **Test Data Builders** (e.g., `UserBuilder`) to arrange test data cleanly. They are allowed to throw exceptions if build parameters are invalid. Do not include comments in tests.
+- **Controllers**: Test API Controllers via **unit tests** using **NSubstitute** to mock use case/application contracts.
+- **Infrastructure**: Test infrastructure components via **integration tests** using in-memory databases (for EF Core) or **Testcontainers** for specific external services (e.g. Postgres, RabbitMQ, Redis).
+- **Domain**: Test Domain Models (Entities, Aggregates) and Value Objects via **unit tests** to validate business invariants, state transition rules, and factory methods without external mocks.
 
 ---
 

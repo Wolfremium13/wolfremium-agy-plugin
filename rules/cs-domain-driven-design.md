@@ -40,7 +40,6 @@ public class InvoiceId
 {
     private readonly string _value;
 
-    // Private constructor guarantees creation only via static validation factory
     private InvoiceId(string value) => _value = value;
 
     public static Either<Error, InvoiceId> Create(string givenInvoiceId)

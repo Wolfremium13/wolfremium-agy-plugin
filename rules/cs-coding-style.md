@@ -15,46 +15,66 @@ The project adopts modern C# features to write concise, immutable, and clean cod
 
 ---
 
-## 2. Application Use Cases & Pipelines
+### 2. Application Use Cases & Pipelines
 
 Application Services coordinate domain interactions using functional query pipelines.
+
+### 2.1 LINQ Queries and Private Helpers
+- Keep LINQ query syntax clean and readable. 
+- If a complex transformation, type mapping, or error mapping (`Bind`/`Match`) does not fit cleanly inside a LINQ pipeline, extract it to a **private method**. Do not clutter the pipeline with inline complex closures.
+
+### 2.2 Application Contracts & Commands
+- **Single File per Contract**: Always declare exactly one use case/service interface (contract) per file. Do not bundle multiple unrelated use case interfaces together.
+- **Commands in Contract Files**: Define the associated input Command or Request record directly in the same file as the interface contract, positioned immediately below the interface definition.
+
+#### Example Contract File (`IRegisterUser.cs`)
+```csharp
+using LanguageExt;
+using LanguageExt.Common;
+
+namespace Common.Billing.Users.Register.Application.Contracts;
+
+public interface IRegisterUser
+{
+    Task<Either<Error, RegisteredUserInfo>> Register(RegisterUserCommand command);
+}
+
+public record RegisterUserCommand(string Username, string Email);
+
+public record RegisteredUserInfo(string UserId, string Username);
+```
 
 ### Example Use Case Implementation
 ```csharp
 using LanguageExt;
 using LanguageExt.Common;
-using Common.Billing.InvoiceGeneration.Domain.Models;
-using Common.Billing.InvoiceGeneration.Domain.Ports;
-using Common.Billing.InvoiceGeneration.Application.Contracts;
+using Common.Billing.Users.Register.Domain.Models;
+using Common.Billing.Users.Register.Domain.Ports;
+using Common.Billing.Users.Register.Application.Contracts;
 using static Common.Billing.Shared.Infrastructure.Errors.BillingErrors;
 
-namespace Common.Billing.InvoiceGeneration.Application.UseCases;
+namespace Common.Billing.Users.Register.Application.UseCases;
 
-public class ProcessInvoicePayment(
-    IBillingTokenCache tokenCache,
-    IInvoicePaymentClient paymentClient,
-    IPaymentGatewayClient gatewayClient,
-    string environmentFlow
-) : IProcessInvoicePayment
+public class RegisterUser(
+    IUserRepository userRepository,
+    IUserEventPublisher eventPublisher
+) : IRegisterUser
 {
-    public async Task<Either<Error, PaymentReceipt>> Process(string rawInvoiceId, decimal rawAmount)
+    public async Task<Either<Error, RegisteredUserInfo>> Register(RegisterUserCommand command)
     {
-        // Execute a functional query pipeline
         return await (
-            from invoiceId in InvoiceId.Create(rawInvoiceId)
-            from token in tokenCache.FindBy(invoiceId, environmentFlow)
-            select (invoiceId, token)
-        ).MatchAsync(
-            Right: context => context.token,
-            LeftAsync: async _ => await (
-                from invoiceId in InvoiceId.Create(rawInvoiceId).ToAsync()
-                from paymentToken in paymentClient.RequestToken(invoiceId).ToAsync()
-                from receipt in gatewayClient.ExecuteTransaction(paymentToken, rawAmount).ToAsync()
-                from __ in tokenCache.Save(invoiceId, paymentToken, environmentFlow).ToAsync()
-                select paymentToken
-            )
+            from username in Username.Create(command.Username).ToAsync()
+            from email in EmailAddress.Create(command.Email).ToAsync()
+            from user in CreateUserEntity(username, email).ToAsync()
+            from _ in userRepository.Save(user).ToAsync()
+            from __ in eventPublisher.PublishUserRegistered(user).ToAsync()
+            select new RegisteredUserInfo(user.Id, user.Username)
         );
     }
+
+    // Private helper methods isolate logic that does not fit cleanly in the main LINQ query
+    private Either<Error, User> CreateUserEntity(Username username, EmailAddress email) =>
+        User.Create(username, email);
 }
 ```
 
@@ -62,7 +82,12 @@ public class ProcessInvoicePayment(
 
 ## 3. Centralized Error Handling
 
-Custom domain and system exceptions are defined centrally using static error holder classes and C# 12 primary constructor exception inheritances.
+Custom errors are modeled using LanguageExt's `Either<Error, T>`.
+
+### Exception and Error Handling Guidelines
+- **No Exception Throwing/Catching**: Do not throw or catch exceptions to handle control flow, business validation, or external client failures in production code. Use `Either` and return `Error.New(new Exception(...))` if wrapping an exception.
+- **Builder Exception Exception**: Inside the test project, Test Data Builders (e.g., `UserBuilder`) are permitted to throw exceptions (such as `InvalidOperationException`) when a test setup is invalid.
+- **Ports return Either**: All interfaces defined as ports must return `Either` or `EitherAsync` to represent operations that can fail, enforcing error management at compile time.
 
 ### Example Error Definitions
 ```csharp
@@ -70,7 +95,6 @@ namespace Common.Billing.Shared.Infrastructure.Errors;
 
 public static class BillingErrors
 {
-    // Custom exceptions grouped under static classes
     public class ClientValidationException(string message) : Exception(message);
     
     public class GatewayTimeoutException(string message) : Exception(message);
@@ -85,67 +109,53 @@ public static class BillingErrors
 
 ## 4. Web API Controllers
 
-Controllers follow RESTful principles, provide comprehensive OpenAPI metadata, and map functional pipeline results to standard HTTP responses.
+Controllers must follow the Single Responsibility Principle and the REPR (Request-Endpoint-Response) pattern.
 
-- **Attributes**: Every endpoint must state its routing, summary, description, and expected response types (`ProducesResponseType`).
-- **Functional Mapping**: Action bodies use monadic bindings (`Match`/`MatchAsync`), returning standard ASP.NET Core `IResult` outputs (`Results.Ok`, `Results.Problem`).
-- **Response DTOs**: Implemented cleanly as record types below the controller class.
+- **Single Action Method**: Each controller class must expose exactly **one** public action method.
+- **Naming Convention**: The controller class and file must be named `<original-name><action>Should.cs` (e.g., `UserRegisterShould.cs`).
+- **Attributes**: State versioning, routing, OpenAPI summary, description, and expected response types (`ProducesResponseType`).
+- **Functional Mapping**: Map Either outcomes to `IResult` outputs using `.Match` or `.MatchAsync`.
 
-### Example Controller
+### Example Controller (`UserRegisterShould.cs`)
 ```csharp
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
-using Common.Billing.InvoiceGeneration.Domain.Models;
-using Common.Billing.InvoiceGeneration.Application.Contracts;
+using Common.Billing.Users.Register.Domain.Models;
+using Common.Billing.Users.Register.Application.Contracts;
 using static Common.Billing.Shared.Infrastructure.Errors.BillingErrorsWeb;
 
-namespace DomainProject.Internal.Web.Controllers.V1.Billing;
+namespace DomainProject.Internal.Web.Controllers.V1.Users;
 
 [ApiController]
-[Route("v1/billing")]
-[Tags("Invoice Operations")]
-public class InvoiceBillingController(
-    IProcessInvoicePayment paymentService
+[Route("v1/users")]
+[Tags("User Management")]
+public class UserRegisterShould(
+    IRegisterUser registerService
 ) : ControllerBase
 {
-    [HttpPost("process-payment")]
+    [HttpPost("register")]
     [Produces("application/json")]
-    [EndpointSummary("Process payment for a specific customer invoice")]
-    [EndpointDescription(
-        """
-        Submits an invoice identifier and payment amount to process via the integrated billing engine.
-
-        **Status Codes:**
-        - **200 OK**: Payment was processed successfully.
-        - **400 Bad Request**: Invalid inputs.
-        - **404 Not Found**: Invoice not found.
-        - **502 Bad Gateway**: Payment gateway unavailable.
-        """
-    )]
-    [ProducesResponseType(typeof(PaymentResponse), StatusCodes.Status200OK)]
+    [EndpointSummary("Register a new user")]
+    [EndpointDescription("Validates and registers a new user with the specified credentials.")]
+    [ProducesResponseType(typeof(RegisterResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<IResult> ProcessPayment(
-        [FromQuery(Name = "invoiceId"), Description("Target invoice identifier")] string invoiceId,
-        [FromQuery(Name = "amount"), Description("Transaction amount")] decimal amount
+    public async Task<IResult> Register(
+        [FromQuery(Name = "username")] string username,
+        [FromQuery(Name = "email")] string email
     ) =>
         await (
-            from receipt in paymentService.Process(invoiceId, amount).ToAsync()
-            select new PaymentResponse(
-                receipt.TransactionId,
-                receipt.Status,
-                receipt.ProcessedAt
-            )
+            from info in registerService.Register(new RegisterUserCommand(username, email)).ToAsync()
+            select new RegisterResponse(info.UserId, info.Username)
         ).Match<IResult>(
             success => Results.Ok(success),
             error => Results.Problem(MapToProblemDetails(error, HttpContext))
         );
 }
 
-public record PaymentResponse(
-    [property: JsonPropertyName("transactionId")] string TransactionId,
-    [property: JsonPropertyName("status")] string Status,
-    [property: JsonPropertyName("processedAt")] DateTime ProcessedAt
+public record RegisterResponse(
+    [property: JsonPropertyName("userId")] string UserId,
+    [property: JsonPropertyName("username")] string Username
 );
 ```
 
@@ -153,7 +163,7 @@ public record PaymentResponse(
 
 ## 5. Event Consumers & Background Workers
 
-Background services (like Azure Service Bus consumers) extend base workers and process incoming domain event payloads using LanguageExt pipelines.
+Background services process incoming domain event payloads using LanguageExt pipelines.
 
 ### Example Background Consumer
 ```csharp
@@ -186,5 +196,37 @@ public class ProcessBillingNotificationConsumer(
             )).ToAsync()
             select Unit.Default
         );
+}
+```
+
+---
+
+## 6. Dependency Injection & Configuration Setup
+
+To keep `Program.cs` clean, always encapsulate DI registrations inside extension methods.
+
+### Example Extension Method
+```csharp
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Common.Billing.Users.Register.Domain.Ports;
+using Common.Billing.Users.Register.Infrastructure;
+
+namespace Common.Billing.Users.Register.Infrastructure.Settings;
+
+public static class RegisterServiceCollectionExtensions
+{
+    public static IServiceCollection AddUserRegisterServices(
+        this IServiceCollection services, 
+        IConfiguration configuration
+    )
+    {
+        var settings = configuration.GetSection("UserRegisterSettings").Get<UserRegisterSettings>();
+        services.AddSingleton(settings);
+
+        services.AddScoped<IUserRepository, PostgresUserRepository>();
+
+        return services;
+    }
 }
 ```

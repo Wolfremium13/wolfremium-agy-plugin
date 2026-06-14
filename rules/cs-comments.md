@@ -1,20 +1,10 @@
-**The overarching heuristic rule for your agent is: Comments should describe
-things that aren't obvious from the code itself.**
+**The overarching heuristic rule is: Avoid comments as much as possible. Code should be self-documenting through clear naming, types, and structure.**
 
-Before writing a comment, the agent should follow this decision-making framework
-to determine whether a comment is necessary and how to structure it:
+Only use comments to describe things that aren't obvious from the code itself, and keep them to an absolute minimum.
 
-### Phase 1: Ask "Can this comment be eliminated by better code?"
-
-Before leaving a comment, the agent must evaluate if the code can be refactored
-to speak for itself.
-
-- **Can the type system explain it?** Guide the reader by giving APIs distinct
-  types first, as types are enforced by the compiler. Do not say anything in a
-  method name or comment that you can say with a type.
-- **Can a name explain it?** If the comment simply explains what a block of code
-  does, **extract that block into a function and give it a well-thought-out
-  name**. You should favor well-named methods over comments.
+### Crucial Constraints:
+- **No Comments in Tests**: Do not write comments in unit tests or integration tests to label sections (e.g., do NOT write `// Arrange`, `// Act`, `// Assert`). Instead, separate these logical phases strictly with empty lines (vertical whitespace).
+- **Can the type system or a name explain it?** Guide the reader by giving APIs distinct types first, as types are enforced by the compiler. If a comment simply explains what a block of code does, extract that block into a function and give it a well-thought-out name. Favor well-named methods over comments.
 - **Does it explain _HOW_ the code works?** If a comment details the mechanics
   of the implementation, it should be deleted. The code already shows how it
   operates; **commenting on the "how" is redundant and violates the DRY (Don't
