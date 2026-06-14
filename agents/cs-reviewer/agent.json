@@ -4,12 +4,12 @@
   "description": "Specialized C# code reviewer and auditor agent that evaluates codebases for DDD, Clean Architecture, typing, testing, and LanguageExt monadic patterns.",
   "model": "gemini-2.5-flash",
   "rules": [
-    "architecture.md",
-    "coding-style.md",
-    "comments.md",
-    "domain-driven-design.md",
-    "naming.md",
-    "testing.md"
+    "cs-architecture.md",
+    "cs-coding-style.md",
+    "cs-comments.md",
+    "cs-domain-driven-design.md",
+    "cs-naming.md",
+    "cs-testing.md"
   ],
   "skills": [
     "cs-lint-project"

@@ -35,34 +35,34 @@ Before running any audit steps, the agent MUST review the information architectu
 
 Inspect each target file against the following specific rules:
 
-### 1. Architectural & Namespace Alignment (from `architecture.md`)
+### 1. Architectural & Namespace Alignment (from `cs-architecture.md`)
 - **Namespaces**: Verify that namespaces exactly match the folder structure:
   - Expect: `namespace Common.[DomainSubdomain].[BoundedContext].[Layer].[SubFolder];`
-- **File-Scoped Namespaces**: Ensure namespaces use file-scoped syntax (e.g., `namespace X;` with no curly braces) as per `coding-style.md`.
+- **File-Scoped Namespaces**: Ensure namespaces use file-scoped syntax (e.g., `namespace X;` with no curly braces) as per `cs-coding-style.md`.
 - **Feature Slicing**: Ensure files are organized in the `[FeatureConcept]/[FeatureAction]/[Layer]` folder hierarchy.
 
-### 2. Domain-Driven Design Invariants (from `domain-driven-design.md`)
+### 2. Domain-Driven Design Invariants (from `cs-domain-driven-design.md`)
 - **Domain Models**: Are entities/aggregates defined as `class`? Are their constructors `private`? Do they use static factory methods (`Create`) returning `Either<Error, T>`?
 - **Value Objects**: Are they immutable `class` or `record` types with `readonly` fields? Are their constructors `private` with static `Create` factory methods returning `Either<Error, T>`?
 - **State Encapsulation**: Are there any public properties with public setters? Ensure state is mutated or queried exclusively through domain-language methods ("Tell, Don't Ask").
 - **Events & DTOs**: Are they defined as `record` types?
 
-### 3. Error Handling & Pipelines (from `architecture.md` & `coding-style.md`)
+### 3. Error Handling & Pipelines (from `cs-architecture.md` & `cs-coding-style.md`)
 - **Exceptions**: Ensure the code does not throw exceptions for domain validation. Validation must return `Either<Error, T>` or `EitherAsync<Error, T>`.
 - **Monadic Bindings**: Ensure query/pipeline operations use LINQ query syntax or monadic methods (`Match`/`MatchAsync`), avoiding raw try-catch blocks or null-returns in application/domain layers.
 
-### 4. Naming Conventions (from `naming.md`)
+### 4. Naming Conventions (from `cs-naming.md`)
 - **Interfaces**: Check if interfaces are prefixed with `I` (e.g., `IInvoicePaymentClient`) and represent a business abstraction.
 - **Infrastructure Adapters**: Check concrete implementations in the `Infrastructure` folder. They must be prefixed with their specific technology/protocol (e.g., `PostgresDocumentRepository`) and MUST NOT use generic suffixes like `Impl` or `Base`.
 - **Catch-All Words**: Ensure classes do not contain words like `Manager`, `Helper`, `Processor`, `Engine`, `Tool`, or `Utils`.
 - **Consistency**: Verify that the same name is used for a specific concept throughout.
 
-### 5. Commenting Guidelines (from `comments.md`)
+### 5. Commenting Guidelines (from `cs-comments.md`)
 - **Redundancy (Phase 1)**: Verify that comments do not explain "how" the code works, repeat the code, or could be replaced by better naming or types.
 - **Interface Comments (Phase 2)**: Ensure interface methods have high-level comments explaining preconditions, side effects, exceptions, and return values without detailing implementation.
 - **Code Clarity**: Check for comments documenting surprises, quirks, units of measurements, boundary conditions, or why alternatives were discarded.
 
-### 6. Testing Patterns (from `testing.md`)
+### 6. Testing Patterns (from `cs-testing.md`)
 - **Naming**: Ensure test classes are named `[ClassName]Should` and test methods use PascalCase describing the expected behavior.
 - **Mocks & Assertions**: Verify that tests use `xUnit`, `Shouldly` assertions (e.g., `ShouldBe`), and `NSubstitute` mocks.
 - **Builders**: Verify that complex test data setup utilizes the Test Data Builder pattern.

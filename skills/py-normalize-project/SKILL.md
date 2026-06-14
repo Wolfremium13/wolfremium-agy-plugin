@@ -37,34 +37,34 @@ Before performing any code modifications, the agent MUST review the information 
 
 Execute the refactoring steps precisely based on the workspace rules:
 
-### 1. Import & Feature Slicing Normalization (from `architecture.md`)
+### 1. Import & Feature Slicing Normalization (from `py-architecture.md`)
 - Convert relative imports (e.g. `from ..models import X`) to absolute imports starting with `src`.
 - Ensure imports flow strictly inward (no infrastructure imports in domain/application layers).
 - Move misplaced files to conform with the vertical slice hierarchy `[feature_concept]/[feature_action]/[layer]`.
 
-### 2. DDD Model Normalization (from `domain-driven-design.md`)
+### 2. DDD Model Normalization (from `py-domain-driven-design.md`)
 - Convert domain models to regular classes, and value objects/DTOs to `@dataclass(frozen=True)` or frozen Pydantic models.
 - Set class constructor calls to be protected by team conventions, routing instantiation exclusively through a `@classmethod` factory method `create(...)`.
 - Implement validation inside the factory method, returning `Failure` wrapping a domain exception if invariants are violated.
 - Convert mutable public attributes to protected fields (prefixed with `_`) and remove public setters. Implement modification methods in the domain language ("Tell, Don't Ask").
 - Convert DTOs and events to frozen dataclasses.
 
-### 3. Error Handling & Functional Pipeline Normalization (from `architecture.md` & `coding-style.md`)
+### 3. Error Handling & Functional Pipeline Normalization (from `py-architecture.md` & `py-coding-style.md`)
 - Replace standard exceptions (like `raise ValueError(...)`) in Use Cases, Domain Models, or API Routers with monadic `Result` returns.
 - Rewrite procedural methods to use Python pattern matching (`match case`) to branch on success or failure results.
 - Convert FastAPI endpoint methods to return DTO schemas mapping results, raising `HTTPException` on monadic `Failure`.
 
-### 4. Naming Normalization (from `naming.md`)
+### 4. Naming Normalization (from `py-naming.md`)
 - Remove the `I` prefix from all interface/port classes, using abstract base classes (`abc.ABC`).
 - Remove generic prefixes/suffixes like `Impl` or `Base` from infrastructure classes. Prefix them with specific tech names (e.g. rename `DocumentRepositoryImpl` to `PostgresDocumentRepository`).
 - Rename any classes using catch-all words (like `Manager`, `Helper`, `Processor`, `Engine`, `Utils`) to names representing concrete business intents.
 
-### 5. Comment Cleanup (from `comments.md`)
+### 5. Comment Cleanup (from `py-comments.md`)
 - Delete comments that explain "how" the code works or repeat what the code says.
 - If a comment explains what a block of code does, extract that block into a well-named helper function and delete the comment.
 - Format all docstrings to Google Python Style Guide standards, ensuring no duplicate type information is documented.
 
-### 6. Test & Test Data Builder Normalization (from `testing.md`)
+### 6. Test & Test Data Builder Normalization (from `py-testing.md`)
 - Rename test files to `test_[module].py`, test classes to `Test[ClassName]`, and test methods to snake_case.
 - Convert test assertions to `assertpy` fluent syntax (`assert_that(val).is_equal_to(...)`).
 - Implement `unittest.mock` or `mocker` for mocks and stub behaviors.

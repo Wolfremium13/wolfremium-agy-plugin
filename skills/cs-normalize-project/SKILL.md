@@ -37,12 +37,12 @@ Before performing any code modifications, the agent MUST review the information 
 
 Execute the refactoring steps precisely based on the workspace rules:
 
-### 1. Namespace & File-Scoped Namespace Conversion (from `architecture.md` & `coding-style.md`)
+### 1. Namespace & File-Scoped Namespace Conversion (from `cs-architecture.md` & `cs-coding-style.md`)
 - Replace block-scoped namespaces (with curly braces) with file-scoped namespaces (e.g., `namespace Common.Domain;`).
 - Adjust the namespace value to match the exact directory path:
   `namespace Common.[DomainSubdomain].[BoundedContext].[Layer].[SubFolder];`
 
-### 2. DDD Model Normalization (from `domain-driven-design.md`)
+### 2. DDD Model Normalization (from `cs-domain-driven-design.md`)
 - Change Domain Entities and Aggregates from `struct` or `record` to `class` where appropriate.
 - Mark all constructors of domain models and value objects as `private`.
 - Introduce a static factory method `public static Either<Error, T> Create(...)` for instantiation.
@@ -50,24 +50,24 @@ Execute the refactoring steps precisely based on the workspace rules:
 - Convert mutable public properties to `readonly` and remove public setters. Implement modification methods in the domain language ("Tell, Don't Ask").
 - Convert DTOs and events to `record` types.
 
-### 3. Error Handling & Functional Pipeline Normalization (from `architecture.md` & `coding-style.md`)
+### 3. Error Handling & Functional Pipeline Normalization (from `cs-architecture.md` & `cs-coding-style.md`)
 - Replace standard exceptions (like `throw new ArgumentException(...)`) in Use Cases, Domain Models, or API Controllers with LanguageExt monadic returns.
 - Rewrite procedural methods to use functional pipelines:
   - Use LINQ query syntax (`from ... in ... select ...`) to chain operations returning `Either` or `EitherAsync`.
   - Use `.Match(...)` or `.MatchAsync(...)` to handle outcomes at boundaries (e.g., in controllers).
 - Convert API endpoint methods to return `IResult` mapping monadic results to `Results.Ok(success)` or `Results.Problem(MapToProblemDetails(error))`.
 
-### 4. Naming Normalization (from `naming.md`)
+### 4. Naming Normalization (from `cs-naming.md`)
 - Add `I` prefix to all interface names.
 - Remove generic prefixes/suffixes like `Impl` or `Base` from infrastructure classes. Prefix them with specific tech names (e.g., rename `DocumentRepositoryImpl` to `PostgresDocumentRepository`).
 - Rename any classes using catch-all words (like `Manager`, `Helper`, `Processor`, `Engine`, `Utils`) to names representing concrete business intents.
 
-### 5. Comment Cleanup (from `comments.md`)
+### 5. Comment Cleanup (from `cs-comments.md`)
 - Delete comments that explain "how" the code works or repeat what the code says.
 - If a comment explains what a block of code does, extract that block into a well-named helper function and delete the comment.
 - Retain or write clear interface comments describing preconditions, exceptions, side-effects, and returns.
 
-### 6. Test & Test Data Builder Normalization (from `testing.md`)
+### 6. Test & Test Data Builder Normalization (from `cs-testing.md`)
 - Rename test classes to `[ClassName]Should` and target test methods to PascalCase.
 - Convert test assertions to Shouldly fluent syntax (`value.ShouldBe(...)`).
 - Implement NSubstitute for mocks (`Substitute.For<T>()`, `Received()`, `DidNotReceive()`).

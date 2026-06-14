@@ -1,0 +1,6 @@
+{
+  "name": "wolfremium-agents",
+  "displayName": "Wolfremium Agents Configuration",
+  "description": "Central standards, rules, and skills for autonomous AI development agents.",
+  "version": "1.0.0"
+}

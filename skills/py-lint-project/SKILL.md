@@ -35,35 +35,35 @@ Before running any audit steps, the agent MUST review the information architectu
 
 Inspect each target file against the following specific rules:
 
-### 1. Architectural & Import Alignment (from `architecture.md`)
+### 1. Architectural & Import Alignment (from `py-architecture.md`)
 - **Absolute Imports**: Verify that imports use absolute paths starting with `src`.
 - **Dependency Flow**: Check that imports only flow inward:
   - `domain` must NOT import from `application` or `infrastructure`.
   - `application` must NOT import from `infrastructure`.
 - **Feature Slicing**: Ensure files are organized in the `[feature_concept]/[feature_action]/[layer]` folder hierarchy.
 
-### 2. Domain-Driven Design Invariants (from `domain-driven-design.md`)
+### 2. Domain-Driven Design Invariants (from `py-domain-driven-design.md`)
 - **Domain Models**: Are entities/aggregates defined as regular classes? Are their constructors protected? Do they use static factory methods (`create`) returning a generic `Result`?
 - **Value Objects**: Are they immutable dataclasses (`@dataclass(frozen=True)`) or frozen Pydantic models? Are their fields read-only? Do they use `create` factory methods returning a `Result`?
 - **State Encapsulation**: Are there any public class attributes being set directly? Ensure state is mutated or queried exclusively through domain-language methods ("Tell, Don't Ask").
 - **Events & DTOs**: Are they defined as frozen dataclasses or frozen Pydantic models?
 
-### 3. Error Handling & Pipelines (from `architecture.md` & `coding-style.md`)
+### 3. Error Handling & Pipelines (from `py-architecture.md` & `py-coding-style.md`)
 - **Exceptions**: Ensure the code does not raise standard exceptions for domain validation or normal flow control. Validation must return `Result[T, Exception]`.
 - **Pipelines**: Ensure query/pipeline operations handle results via pythonic pattern matching (`match case`), avoiding unhandled Exception raising or null/None returns in domain/application layers.
 
-### 4. Naming Conventions (from `naming.md`)
+### 4. Naming Conventions (from `py-naming.md`)
 - **Interfaces (Ports)**: Ensure interfaces are defined using `abc.ABC` and are NOT prefixed with `I` (e.g. `InvoicePaymentClient`, not `IInvoicePaymentClient`).
 - **Infrastructure Adapters**: Check concrete implementations in the `infrastructure` folder. They must be prefixed with their specific technology/protocol (e.g. `PostgresDocumentRepository`) and MUST NOT use generic suffixes like `Impl` or `Base`.
 - **Catch-All Words**: Ensure classes do not contain words like `Manager`, `Helper`, `Processor`, `Engine`, `Tool`, or `Utils`.
 - **Consistency**: Verify that the same name is used for a specific concept throughout.
 
-### 5. Commenting Guidelines (from `comments.md`)
+### 5. Commenting Guidelines (from `py-comments.md`)
 - **Redundancy**: Verify that comments do not explain "how" the code works, repeat the code, or could be replaced by better naming or types.
 - **Docstrings**: Ensure methods have Google-style docstrings explaining preconditions, side effects, and returns, without repeating parameter type information.
 - **Code Clarity**: Check for comments documenting surprises, quirks, boundary conditions, or why alternatives were discarded.
 
-### 6. Testing Patterns (from `testing.md`)
+### 6. Testing Patterns (from `py-testing.md`)
 - **Naming**: Ensure test files start with `test_`, test classes start with `Test`, and test methods use snake_case starting with `test_`.
 - **Assertions**: Verify that tests use `assertpy` fluent assertions (e.g. `assert_that(val).is_equal_to(expected)`).
 - **Mocks**: Verify that mock setups utilize `unittest.mock` or `mocker` from `pytest-mock`.

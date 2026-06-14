@@ -4,12 +4,12 @@
   "description": "Specialized Python code reviewer and auditor agent that evaluates codebases for DDD, Clean Architecture, typing, testing, and monadic Result patterns.",
   "model": "gemini-2.5-flash",
   "rules": [
-    "architecture.md",
-    "coding-style.md",
-    "comments.md",
-    "domain-driven-design.md",
-    "naming.md",
-    "testing.md"
+    "py-architecture.md",
+    "py-coding-style.md",
+    "py-comments.md",
+    "py-domain-driven-design.md",
+    "py-naming.md",
+    "py-testing.md"
   ],
   "skills": [
     "py-lint-project"

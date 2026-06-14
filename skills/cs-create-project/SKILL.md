@@ -47,37 +47,37 @@ Before writing any code, the agent MUST review the information architecture and 
 
 Follow these strict design rules during creation:
 
-### 1. DDD & Encapsulation Rules (from `domain-driven-design.md`)
+### 1. DDD & Encapsulation Rules (from `cs-domain-driven-design.md`)
 - **Entities/Aggregates**: Use standard C# `class`. Keep constructors `private`. Use `public static Either<Error, T> Create(...)` factory methods. Never expose public setters.
 - **Value Objects**: Use immutable `class` or `record`. All internal fields must be `readonly`. Instantiation must go through private constructors and `public static Either<Error, T> Create(...)` factory methods. Protect all invariants.
 - **Events & DTOs**: Use C# `record` types to represent immutable data payloads.
 - **Repositories**: Define repo interfaces (ports) in the `Domain/Ports` layer. Implement them in the `Infrastructure` layer.
 
-### 2. Modern C# Features & Coding Style (from `coding-style.md`)
+### 2. Modern C# Features & Coding Style (from `cs-coding-style.md`)
 - Use **file-scoped namespaces** to reduce nesting.
 - Use **primary constructors** for dependency injection in classes/controllers.
 - Use **expression-bodied members (`=>`)** for single-expression methods.
 - Emphasize class immutability by using `required` and `readonly` fields.
 
-### 3. Monadic Control Flow (from `architecture.md` & `coding-style.md`)
+### 3. Monadic Control Flow (from `cs-architecture.md` & `cs-coding-style.md`)
 - Do not throw exceptions for domain validation. Use `LanguageExt` monadic control flow.
 - Return `Either<Error, T>` or `EitherAsync<Error, T>`.
 - Use LINQ query syntax (`from ... in ... select ...`) for pipeline execution.
 
-### 4. Naming Conventions (from `naming.md`)
+### 4. Naming Conventions (from `cs-naming.md`)
 - Interfaces prefixed with `I` (e.g., `IInvoicePaymentClient`).
 - Infrastructure classes prefixed with specific technology/protocol, never generic suffixes like `Impl` (e.g., `PostgresDocumentRepository` instead of `DocumentRepositoryImpl`).
 - Unit test classes named `[ClassName]Should` (e.g., `PaymentProcessorShould`).
 - No generic, catch-all words (no `Manager`, `Helper`, `Processor`, `Engine`, `Utils`). Use precise domain concepts.
 
-### 5. Centralized Error Handling (from `coding-style.md`)
+### 5. Centralized Error Handling (from `cs-coding-style.md`)
 - Use static error holder classes with nested custom exception classes extending `Exception` (e.g., `BillingErrors.ClientValidationException`).
 
-### 6. Web Controllers & Workers (from `coding-style.md`)
+### 6. Web Controllers & Workers (from `cs-coding-style.md`)
 - Web controllers must specify routing, OpenAPI endpoints metadata via attributes (`Produces`, `EndpointSummary`, `EndpointDescription`, `ProducesResponseType`).
 - Map pipelines to `IResult` via `.Match(...)` or `.MatchAsync(...)` using `Results.Ok` and `Results.Problem`.
 
-### 7. Unit Testing (from `testing.md`)
+### 7. Unit Testing (from `cs-testing.md`)
 - Create unit tests using **xUnit**, **Shouldly** (fluent assertions), and **NSubstitute** (mocking).
 - Assert both success and failure (invalid boundary) states for value objects.
 - Create **Test Data Builders** (e.g., `InvoiceIdBuilder`) to arrange test data cleanly.
