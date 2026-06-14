@@ -2,7 +2,7 @@
   "name": "py-developer",
   "displayName": "Python Developer",
   "description": "Specialized Python developer agent that creates, refactors, and implements features using Clean Architecture, DDD, and monadic Result patterns.",
-  "model": "gemini-2.5-pro",
+  "model": "gemini-3.1-pro-high",
   "rules": [
     "py-architecture.md",
     "py-coding-style.md",

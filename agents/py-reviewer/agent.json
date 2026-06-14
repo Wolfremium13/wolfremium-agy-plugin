@@ -2,7 +2,7 @@
   "name": "py-reviewer",
   "displayName": "Python Reviewer",
   "description": "Specialized Python code reviewer and auditor agent that evaluates codebases for DDD, Clean Architecture, typing, testing, and monadic Result patterns.",
-  "model": "gemini-2.5-flash",
+  "model": "gemini-3.5-flash-medium",
   "rules": [
     "py-architecture.md",
     "py-coding-style.md",

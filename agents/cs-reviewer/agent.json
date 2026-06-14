@@ -2,7 +2,7 @@
   "name": "cs-reviewer",
   "displayName": "C# Reviewer",
   "description": "Specialized C# code reviewer and auditor agent that evaluates codebases for DDD, Clean Architecture, typing, testing, and LanguageExt monadic patterns.",
-  "model": "gemini-2.5-flash",
+  "model": "gemini-3.5-flash-medium",
   "rules": [
     "cs-architecture.md",
     "cs-coding-style.md",
